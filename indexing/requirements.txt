@@ -1,0 +1,10 @@
+boto3
+langchain
+PyPDF2
+langchain-aws
+llama-index
+python-dotenv
+opensearch-py
+sagemaker
+ragas==0.2.6
+langchain_aws==0.2.7

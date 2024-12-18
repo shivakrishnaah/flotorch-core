@@ -1,0 +1,6 @@
+{
+  "removeRange": true,
+  "reject": [
+    "typescript"
+  ]
+}
