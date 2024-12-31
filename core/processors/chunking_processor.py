@@ -1,6 +1,6 @@
-from typing import Dict, List, Type
+from typing import Dict, List, Type, Union
 from core.chunking import FixedChunker, HierarchicalChunker
-from baseclasses.base_classes import BaseChunker
+from baseclasses.base_classes import BaseChunker, BaseHierarchicalChunker
 import logging
 from config.experimental_config import ExperimentalConfig
 
@@ -10,7 +10,7 @@ logger.setLevel(logging.INFO)
 class ChunkingProcessor:
     """Processor for managing text chunking."""
 
-    CHUNKER_STRATEGIES: Dict[str, Type[BaseChunker]] = {
+    CHUNKER_STRATEGIES: Dict[str, Union[Type[BaseChunker], Type[BaseHierarchicalChunker]]] = {
         "Fixed": FixedChunker,
         "Hierarchical": HierarchicalChunker
     }
@@ -19,7 +19,7 @@ class ChunkingProcessor:
         self.experimentalConfig = experimentalConfig
         self.chunker = self._initialize_chunker()
 
-    def _initialize_chunker(self) -> BaseChunker:
+    def _initialize_chunker(self) -> Union[BaseChunker, BaseHierarchicalChunker]:
         """Initialize the chunker based on the selected strategy."""
         strategy = self.experimentalConfig.chunking_strategy.lower()  # Normalize to lower case
         chunker_strategies = {key.lower(): value for key, value in self.CHUNKER_STRATEGIES.items()}  # Case-insensitive map
@@ -27,12 +27,19 @@ class ChunkingProcessor:
             raise ValueError(f"Unknown chunking strategy: {strategy}")
 
         logger.info(f"Initializing {strategy} chunker...")
-        return chunker_strategies[strategy](
-            self.experimentalConfig.chunk_size,
-            self.experimentalConfig.chunk_overlap
-        )
+        if strategy == 'fixed':
+            return chunker_strategies[strategy](
+                self.experimentalConfig.chunk_size,
+                self.experimentalConfig.chunk_overlap
+            )
+        elif strategy == 'hierarchical':
+            return chunker_strategies[strategy](
+                self.experimentalConfig.hierarchical_parent_chunk_size,
+                self.experimentalConfig.hierarchical_child_chunk_size,
+                self.experimentalConfig.hierarchical_chunk_overlap_percentage
+            )
 
-    def chunk(self, texts: List[str]) -> List[str]:
+    def chunk(self, texts: List[str]) -> Union[List[str], List[List[str]]]:
         """Chunk the input list of text into a single flat list"""
         all_chunks = [chunk for text in texts for chunk in self.chunker.chunk(text)]
         return all_chunks
