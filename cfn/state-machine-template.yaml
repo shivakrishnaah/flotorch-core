@@ -61,6 +61,9 @@ Parameters:
     Type: String
     Description: System prompt for inference
     Default: "You are a helpful assistant. Use the provided context to answer questions accurately. If you cannot find the answer in the context, say so"
+  SageMakerRoleArn:
+    Type: String
+    Description: ARN of the SageMaker role
 
 Resources:
   StateMachineRole:
@@ -177,6 +180,7 @@ Resources:
                   "InferencePrompt": "${InferenceSystemPrompt}",
                   "PrivateSubnets": ${subnets_array},
                   "SecurityGroups": ["${security_groups}"],
+                  "SageMakerRoleArn": "${SageMakerRoleArn}",
                   "execution_id.$": "$.execution_id"
                 },
                 "Next": "Query model invocations"
@@ -418,7 +422,8 @@ Resources:
                           "ClusterArn": "${EcsClusterArn}",
                           "IndexingTaskDefinitionArn": "${IndexingTaskDefinitionArn}",
                           "RetrieverTaskDefinitionArn": "${RetrieverTaskDefinitionArn}",
-                          "EvaluationTaskDefinitionArn": "${EvaluationTaskDefinitionArn}"
+                          "EvaluationTaskDefinitionArn": "${EvaluationTaskDefinitionArn}",
+                          "SageMakerRoleArn": "${SageMakerRoleArn}"
                         }
                       },
                       "Next": "Indexing Model Check"
@@ -661,6 +666,10 @@ Resources:
                                 {
                                   "Name": "TASK_TOKEN",
                                   "Value.$": "$$.Task.Token"
+                                },
+                                {
+                                  "Name": "sagemaker_role_arn",
+                                  "Value.$": "$.parsedConfig.parsed_config.SageMakerRoleArn"
                                 }
                               ]
                             }
@@ -875,6 +884,10 @@ Resources:
                                 {
                                   "Name": "TASK_TOKEN",
                                   "Value.$": "$$.Task.Token"
+                                },
+                                {
+                                  "Name": "sagemaker_role_arn",
+                                  "Value.$": "$.parsedConfig.parsed_config.SageMakerRoleArn"
                                 }
                               ]
                             }
@@ -1309,6 +1322,10 @@ Resources:
                                 {
                                   "Name": "experiment_question_metrics_experimentid_index",
                                   "Value": "experiment_id-index"
+                                },
+                                {
+                                  "Name": "sagemaker_role_arn",
+                                  "Value.$": "$.parsedConfig.parsed_config.SageMakerRoleArn"
                                 }
                               ]
                             }
@@ -1512,7 +1529,8 @@ Resources:
                           "ClusterArn": "${EcsClusterArn}",
                           "IndexingTaskDefinitionArn": "${IndexingTaskDefinitionArn}",
                           "RetrieverTaskDefinitionArn": "${RetrieverTaskDefinitionArn}",
-                          "EvaluationTaskDefinitionArn": "${EvaluationTaskDefinitionArn}"
+                          "EvaluationTaskDefinitionArn": "${EvaluationTaskDefinitionArn}",
+                          "SageMakerRoleArn": "${SageMakerRoleArn}"
                         }
                       },
                       "Next": "Indexing Model Check"
@@ -1552,6 +1570,7 @@ Resources:
           OpenSearchAdminUser: !Ref OpenSearchAdminUser
           OpenSearchAdminPassword: !Ref OpenSearchAdminPassword
           InferenceSystemPrompt: !Ref InferenceSystemPrompt
+          SageMakerRoleArn: !Ref SageMakerRoleArn
           subnets_array: !Join ["", ["[\"", !Join ["\",\"", !Ref PrivateSubnets], "\"]"]]
           security_groups: !Ref SecurityGroups
 

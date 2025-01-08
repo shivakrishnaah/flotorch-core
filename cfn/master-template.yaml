@@ -188,6 +188,7 @@ Resources:
         OpenSearchEndpoint: !GetAtt OpenSearchStack.Outputs.OpenSearchEndpoint
         OpenSearchAdminUser: !Ref OpenSearchAdminUser
         OpenSearchAdminPassword: !Ref OpenSearchAdminPassword
+        SageMakerRoleArn: !GetAtt VPCStack.Outputs.BedrockRoleArn
 
   AppRunnerStack:
     Type: AWS::CloudFormation::Stack
