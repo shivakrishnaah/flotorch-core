@@ -82,18 +82,49 @@ Resources:
               - Effect: Allow
                 Action:
                   - dynamodb:*
-                Resource: '*'
+                Resource: 
+                  - !Sub arn:aws:dynamodb:${Region}:${AccountId}:table/Execution_${TableSuffix}
+                  - !Sub arn:aws:dynamodb:${Region}:${AccountId}:table/Execution_${TableSuffix}/index/*
+                  - !Sub arn:aws:dynamodb:${Region}:${AccountId}:table/ExecutionModelInvocations_${TableSuffix}
+                  - !Sub arn:aws:dynamodb:${Region}:${AccountId}:table/ExecutionModelInvocations_${TableSuffix}/index/*
+                  - !Sub arn:aws:dynamodb:${Region}:${AccountId}:table/Experiment_${TableSuffix}
+                  - !Sub arn:aws:dynamodb:${Region}:${AccountId}:table/Experiment_${TableSuffix}/index/*
+                  - !Sub arn:aws:dynamodb:${Region}:${AccountId}:table/ExperimentQuestionMetrics_${TableSuffix}
+                  - !Sub arn:aws:dynamodb:${Region}:${AccountId}:table/ExperimentQuestionMetrics_${TableSuffix}/index/*
               - Effect: Allow
                 Action:
                   - s3:*
+                Resource: 
+                  - !Sub arn:aws:s3:::${DataBucketName}
+                  - !Sub arn:aws:s3:::${DataBucketName}/*
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                Resource: 
+                  - !Sub arn:aws:logs:${Region}:${AccountId}:log-group:/aws/apprunner/*
+              - Effect: Allow
+                Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DeleteNetworkInterface
                 Resource: '*'
               - Effect: Allow
                 Action:
-                  - logs:*
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
                 Resource: '*'
               - Effect: Allow
                 Action:
-                  - ec2:*
+                  - bedrock:*
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - sagemaker:*
                 Resource: '*'
               - Effect: Allow
                 Action:
@@ -110,10 +141,6 @@ Resources:
             Principal:
               Service: build.apprunner.amazonaws.com
             Action: sts:AssumeRole
-          - Effect: Allow
-            Principal:
-              Service: tasks.apprunner.amazonaws.com
-            Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSAppRunnerServicePolicyForECRAccess
       Policies:
@@ -128,7 +155,9 @@ Resources:
               - Effect: Allow
                 Action:
                   - s3:*
-                Resource: '*'
+                Resource: 
+                  - !Sub arn:aws:s3:::${DataBucketName}
+                  - !Sub arn:aws:s3:::${DataBucketName}/*
               - Effect: Allow
                 Action:
                   - dynamodb:*
@@ -146,6 +175,21 @@ Resources:
     Type: AWS::AppRunner::Service
     Properties:
       ServiceName: !Sub flotorch-webapp-${TableSuffix}
+      NetworkConfiguration:
+        EgressConfiguration:
+          EgressType: VPC
+          VpcConnectorArn: !Ref VpcConnectorArn
+      HealthCheckConfiguration:
+        Path: /health
+        Protocol: HTTP
+        HealthyThreshold: 1
+        UnhealthyThreshold: 5
+        Interval: 10
+        Timeout: 5
+      InstanceConfiguration:
+        Cpu: '2 vCPU'
+        Memory: '4 GB'
+        InstanceRoleArn: !GetAtt AppRunnerInstanceRole.Arn
       SourceConfiguration:
         AuthenticationConfiguration:
           AccessRoleArn: !GetAtt AppRunnerAccessRole.Arn
@@ -200,25 +244,8 @@ Resources:
                 Value: !Ref DataBucketName
               - Name: sagemaker_role_arn
                 Value: !Ref BedrockRoleArn
-              - Name: step_function_arn
+              - Name: STEP_FUNCTION_ARN
                 Value: !Sub arn:aws:states:${Region}:${AccountId}:stateMachine:FlotorchStateMachine-${TableSuffix}
-              - Name: vector_field_name
-                Value: vectors
-      HealthCheckConfiguration:
-        Path: /health
-        Protocol: HTTP
-        Interval: 20
-        Timeout: 5
-        HealthyThreshold: 1
-        UnhealthyThreshold: 5
-      InstanceConfiguration:
-        Cpu: 2048
-        Memory: 4096
-        InstanceRoleArn: !GetAtt AppRunnerInstanceRole.Arn
-      NetworkConfiguration:
-        EgressConfiguration:
-          EgressType: VPC
-          VpcConnectorArn: !Ref VpcConnectorArn
 
 Outputs:
   ServiceUrl:

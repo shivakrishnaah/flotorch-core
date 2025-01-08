@@ -142,7 +142,7 @@ Resources:
       CidrBlock: 10.0.6.0/24
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select
-        - 1
+        - 2
         - !GetAZs ''
       Tags:
         - Key: Name
@@ -204,6 +204,12 @@ Resources:
       SubnetId: !Ref PublicSubnet2
       RouteTableId: !Ref PublicRouteTable
 
+  PublicSubnetRouteTableAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet3
+      RouteTableId: !Ref PublicRouteTable
+
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -233,6 +239,12 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateSubnetRouteTableAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet3
       RouteTableId: !Ref PrivateRouteTable
 
   AppRunnerSecurityGroup:

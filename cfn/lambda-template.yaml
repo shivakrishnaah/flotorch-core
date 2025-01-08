@@ -351,7 +351,14 @@ Resources:
                       aws ecr get-login-password --region "us-east-1" | docker login --username AWS --password-stdin "709825985650.dkr.ecr.us-east-1.amazonaws.com"
 
                       # Pull images
-                      CONTAINER_IMAGES="709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-indexing:1.4.0,709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-ai:1.4.2,709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-evaluation:1.4.0,709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-app:1.4.0,709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-runtime:1.4.0,709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-retriever:1.4.0"
+                      CONTAINER_IMAGES="
+                      709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-indexing:$INDEXING_IMAGE_TAG,
+                      709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-ai:$AI_IMAGE_TAG,
+                      709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-evaluation:$EVALUATION_IMAGE_TAG,
+                      709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-app:$APP_IMAGE_TAG,
+                      709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-runtime:$RUNTIME_IMAGE_TAG,
+                      709825985650.dkr.ecr.us-east-1.amazonaws.com/fission-labs/flotorch-retriever:$RETRIEVER_IMAGE_TAG
+                      "
 
                       for i in $(echo "$CONTAINER_IMAGES" | sed "s/,/ /g"); do 
                           docker pull "$i"
@@ -537,6 +544,9 @@ Outputs:
   RuntimeLambdaArn:
     Description: ARN of the Runtime Lambda function
     Value: !GetAtt RuntimeLambdaFunction.Arn
+  CostComputeLambdaArn:
+    Description: ARN of the Cost Compute Lambda function
+    Value: !GetAtt CostComputeLambda.Arn
   LambdaRoleArn:
     Description: ARN of the Lambda execution role
     Value: !GetAtt LambdaExecutionRole.Arn

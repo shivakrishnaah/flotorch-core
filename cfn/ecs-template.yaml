@@ -235,6 +235,7 @@ Resources:
       ContainerDefinitions:
         - Name: !Sub FlotorchContainerEvaluation-${TableSuffix}
           Image: !Sub ${EvaluationRepositoryUri}:latest
+          Essential: true
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -268,10 +269,14 @@ Resources:
       GroupName: !Sub IndexerSecurityGroup-${TableSuffix}
       VpcId: !Ref VpcId
       SecurityGroupEgress:
-        - IpProtocol: -1
-          FromPort: -1
-          ToPort: -1
-          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 10.0.0.0/16  # Allow HTTPS traffic within VPC for VPC endpoints
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0    # Allow HTTPS traffic to internet (if needed)
 
   RetrieverSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -280,10 +285,14 @@ Resources:
       GroupName: !Sub RetrieverSecurityGroup-${TableSuffix}
       VpcId: !Ref VpcId
       SecurityGroupEgress:
-        - IpProtocol: -1
-          FromPort: -1
-          ToPort: -1
-          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 10.0.0.0/16  # Allow HTTPS traffic within VPC for VPC endpoints
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0    # Allow HTTPS traffic to internet (if needed)
 
   EvaluationSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -291,11 +300,20 @@ Resources:
       GroupDescription: Security group for Evaluation ECS tasks
       GroupName: !Sub EvaluationSecurityGroup-${TableSuffix}
       VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 10.0.0.0/16
       SecurityGroupEgress:
-        - IpProtocol: -1
-          FromPort: -1
-          ToPort: -1
-          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 10.0.0.0/16  # Allow HTTPS traffic within VPC for VPC endpoints
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0    # Allow HTTPS traffic to internet (if needed)
 
   TaskSecurityGroup:
     Type: AWS::EC2::SecurityGroup

@@ -17,6 +17,9 @@ Parameters:
   PrivateRouteTableId:
     Type: CommaDelimitedList
     Description: "List of private subnet IDs"
+  PrivateSubnetIds:
+    Type: CommaDelimitedList
+    Description: "List of private subnet IDs for interface endpoints"
 
 Resources:
   VPCEndpoint:
@@ -45,8 +48,99 @@ Resources:
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: "0.0.0.0/0" # Adjust this as per your security requirements
+          CidrIp: 10.0.0.0/16
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
       Tags:
+        - Key: ClientName
+          Value: !Ref ClientName
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
+        - Key: ProjectName
+          Value: !Ref ProjectName
+
+  ECRApiEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPCId
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ecr.api"
+      VpcEndpointType: Interface
+      SecurityGroupIds: 
+        - !Ref VPCEndpointSecurityGroup
+      SubnetIds: !Ref PrivateSubnetIds
+      PrivateDnsEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${ClientName}-ecr-api-endpoint
+        - Key: ClientName
+          Value: !Ref ClientName
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
+        - Key: ProjectName
+          Value: !Ref ProjectName
+
+  ECRDockerEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPCId
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ecr.dkr"
+      VpcEndpointType: Interface
+      SecurityGroupIds: 
+        - !Ref VPCEndpointSecurityGroup
+      SubnetIds: !Ref PrivateSubnetIds
+      PrivateDnsEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${ClientName}-ecr-dkr-endpoint
+        - Key: ClientName
+          Value: !Ref ClientName
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
+        - Key: ProjectName
+          Value: !Ref ProjectName
+
+  CloudWatchLogsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPCId
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.logs"
+      VpcEndpointType: Interface
+      SecurityGroupIds: 
+        - !Ref VPCEndpointSecurityGroup
+      SubnetIds: !Ref PrivateSubnetIds
+      PrivateDnsEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${ClientName}-logs-endpoint
+        - Key: ClientName
+          Value: !Ref ClientName
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
+        - Key: ProjectName
+          Value: !Ref ProjectName
+
+  S3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPCId
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      VpcEndpointType: Gateway
+      RouteTableIds: !Ref PrivateRouteTableId
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action:
+              - "s3:*"
+            Resource:
+              - "*"
+      Tags:
+        - Key: Name
+          Value: !Sub ${ClientName}-s3-endpoint
         - Key: ClientName
           Value: !Ref ClientName
         - Key: CreatedBy
@@ -58,6 +152,18 @@ Outputs:
   VPCEndpointId:
     Value: !Ref VPCEndpoint
     Description: "The ID of the VPC Endpoint"
+  ECRApiEndpointId:
+    Value: !Ref ECRApiEndpoint
+    Description: "The ID of the ECR API Endpoint"
+  ECRDockerEndpointId:
+    Value: !Ref ECRDockerEndpoint
+    Description: "The ID of the ECR Docker Endpoint"
+  CloudWatchLogsEndpointId:
+    Value: !Ref CloudWatchLogsEndpoint
+    Description: "The ID of the CloudWatch Logs Endpoint"
+  S3EndpointId:
+    Value: !Ref S3Endpoint
+    Description: "The ID of the S3 Endpoint"
   VPCEndpointSecurityGroupId:
     Value: !Ref VPCEndpointSecurityGroup
     Description: "The ID of the VPC Endpoint SecurityGroup"

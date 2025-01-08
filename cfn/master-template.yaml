@@ -44,6 +44,14 @@ Parameters:
     MaxLength: 41
     ConstraintDescription: "Must be between 8 and 41 characters containing letters, numbers and symbols."
 
+  NginxAuthPassword:
+    Type: String
+    NoEcho: true
+    Description: "Password for NGINX basic authentication"
+    MinLength: 8
+    MaxLength: 41
+    ConstraintDescription: "Must be between 8 and 41 characters containing letters, numbers and symbols."
+
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
@@ -73,6 +81,7 @@ Resources:
       Parameters:
         VPCId: !GetAtt VPCStack.Outputs.VpcId
         PrivateRouteTableId: !GetAtt VPCStack.Outputs.PrivateRouteTableId
+        PrivateSubnetIds: !Join [",", [!GetAtt VPCStack.Outputs.PrivateSubnet1, !GetAtt VPCStack.Outputs.PrivateSubnet2]]
         ProjectName: !Ref ProjectName
         ClientName: !Ref ClientName
         CreatedBy: !Ref CreatedBy
@@ -175,6 +184,7 @@ Resources:
         ExperimentTableName: !GetAtt DynamoDBStack.Outputs.ExperimentTableName
         MetricsTableName: !GetAtt DynamoDBStack.Outputs.MetricsTableName
         ModelInvocationsTableName: !GetAtt DynamoDBStack.Outputs.ModelInvocationsTableName
+        CostComputeLambdaArn: !GetAtt LambdaStack.Outputs.CostComputeLambdaArn
         OpenSearchEndpoint: !GetAtt OpenSearchStack.Outputs.OpenSearchEndpoint
         OpenSearchAdminUser: !Ref OpenSearchAdminUser
         OpenSearchAdminPassword: !Ref OpenSearchAdminPassword
@@ -194,7 +204,7 @@ Resources:
         OpenSearchAdminUser: !Ref OpenSearchAdminUser
         OpenSearchAdminPassword: !Ref OpenSearchAdminPassword
         NginxAuthUser: !Ref OpenSearchAdminUser
-        NginxAuthPassword: !Ref OpenSearchAdminPassword
+        NginxAuthPassword: !Ref NginxAuthPassword
         VpcConnectorArn: !GetAtt VPCStack.Outputs.VpcConnectorArn
         BedrockRoleArn: !GetAtt VPCStack.Outputs.BedrockRoleArn
         EcrRepositoryUri: !GetAtt ECRRepositoryStack.Outputs.AppRepositoryURI
