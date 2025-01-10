@@ -1171,7 +1171,7 @@ Resources:
                         "TableName": "${ModelInvocationsTableName}",
                         "Key": {
                           "execution_model_id": {
-                            "S.$": "States.Format('{}_{}', 'bedrock', $.parsedConfig.parsed_config.eval_model)"
+                            "S.$": "States.Format('{}_{}', 'bedrock', $.parsedConfig.parsed_config.eval_embedding_model)"
                           }
                         }
                       }
@@ -1194,7 +1194,7 @@ Resources:
                         "TableName": "${ModelInvocationsTableName}",
                         "Key": {
                           "execution_model_id": {
-                            "S.$": "States.Format('{}_{}', 'bedrock', $.parsedConfig.parsed_config.eval_model)"
+                            "S.$": "States.Format('{}_{}', 'bedrock', $.parsedConfig.parsed_config.eval_embedding_model)"
                           }
                         },
                         "UpdateExpression": "SET invocations = invocations + :myValueRef",
@@ -1388,7 +1388,7 @@ Resources:
                         "TableName": "${ModelInvocationsTableName}",
                         "Key": {
                           "execution_model_id": {
-                            "S.$": "States.Format('{}_{}', 'bedrock', $.parsedConfig.parsed_config.eval_model)"
+                            "S.$": "States.Format('{}_{}', 'bedrock', $.parsedConfig.parsed_config.eval_embedding_model)"
                           }
                         },
                         "UpdateExpression": "SET invocations = invocations - :myValueRef",
