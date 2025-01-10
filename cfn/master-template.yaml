@@ -85,6 +85,7 @@ Resources:
         ProjectName: !Ref ProjectName
         ClientName: !Ref ClientName
         CreatedBy: !Ref CreatedBy
+        TableSuffix: !Ref TableSuffix
 
   DynamoDBStack:
     Type: AWS::CloudFormation::Stack
@@ -136,6 +137,8 @@ Resources:
         EvaluationRepositoryUri: !GetAtt ECRRepositoryStack.Outputs.EvaluationRepositoryURI
         RuntimeRepositoryUri: !GetAtt ECRRepositoryStack.Outputs.RuntimeRepositoryURI
         AiRepositoryUri: !GetAtt ECRRepositoryStack.Outputs.AIRepositoryURI
+        PublicSubnet1: !GetAtt VPCStack.Outputs.PublicSubnet1
+        PrivateSubnet1: !GetAtt VPCStack.Outputs.PrivateSubnet1
         IndexingImageTag: "1.6.0"
         RetrieverImageTag: "1.6.0"
         AppImageTag: "1.6.0"

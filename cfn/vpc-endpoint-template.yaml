@@ -20,6 +20,9 @@ Parameters:
   PrivateSubnetIds:
     Type: CommaDelimitedList
     Description: "List of private subnet IDs for interface endpoints"
+  TableSuffix:
+    Type: String
+    Description: "Suffix to append to resource names"
 
 Resources:
   VPCEndpoint:
@@ -31,7 +34,7 @@ Resources:
       RouteTableIds: !Ref PrivateRouteTableId
       Tags:
         - Key: Name
-          Value: !Sub ${ClientName}-dynamodb-endpoint
+          Value: !Sub ${ClientName}-dynamodb-endpoint-${TableSuffix}
         - Key: ClientName
           Value: !Ref ClientName
         - Key: CreatedBy
@@ -42,6 +45,7 @@ Resources:
   VPCEndpointSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      GroupName: !Sub ${ClientName}-vpce-sg-${TableSuffix}
       GroupDescription: "Security group for VPC Endpoint"
       VpcId: !Ref VPCId
       SecurityGroupIngress:
@@ -55,6 +59,8 @@ Resources:
           ToPort: 443
           CidrIp: 0.0.0.0/0
       Tags:
+        - Key: Name
+          Value: !Sub ${ClientName}-vpce-sg-${TableSuffix}
         - Key: ClientName
           Value: !Ref ClientName
         - Key: CreatedBy
@@ -74,7 +80,7 @@ Resources:
       PrivateDnsEnabled: true
       Tags:
         - Key: Name
-          Value: !Sub ${ClientName}-ecr-api-endpoint
+          Value: !Sub ${ClientName}-ecr-api-endpoint-${TableSuffix}
         - Key: ClientName
           Value: !Ref ClientName
         - Key: CreatedBy
@@ -94,7 +100,7 @@ Resources:
       PrivateDnsEnabled: true
       Tags:
         - Key: Name
-          Value: !Sub ${ClientName}-ecr-dkr-endpoint
+          Value: !Sub ${ClientName}-ecr-dkr-endpoint-${TableSuffix}
         - Key: ClientName
           Value: !Ref ClientName
         - Key: CreatedBy
@@ -114,7 +120,7 @@ Resources:
       PrivateDnsEnabled: true
       Tags:
         - Key: Name
-          Value: !Sub ${ClientName}-logs-endpoint
+          Value: !Sub ${ClientName}-logs-endpoint-${TableSuffix}
         - Key: ClientName
           Value: !Ref ClientName
         - Key: CreatedBy
@@ -140,7 +146,7 @@ Resources:
               - "*"
       Tags:
         - Key: Name
-          Value: !Sub ${ClientName}-s3-endpoint
+          Value: !Sub ${ClientName}-s3-endpoint-${TableSuffix}
         - Key: ClientName
           Value: !Ref ClientName
         - Key: CreatedBy

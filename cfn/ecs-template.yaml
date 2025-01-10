@@ -55,6 +55,7 @@ Resources:
   TaskRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: !Sub flotorch-task-role-${TableSuffix}
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -74,7 +75,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonECS_FullAccess
         - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
       Policies:
-        - PolicyName: TaskRolePolicy
+        - PolicyName: !Sub task-role-policy-${TableSuffix}
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -118,25 +119,28 @@ Resources:
               - Effect: Allow
                 Action:
                   - ecr:*
+                  - sagemaker:*
+                  - iam:*
+                  - bedrock:*
                 Resource: '*'
 
   IndexingLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /ecs/flotorch-indexing-${TableSuffix}
-      RetentionInDays: 14
+      LogGroupName: !Sub /ecs/flotorch/indexing-${TableSuffix}
+      RetentionInDays: 7
 
   RetrieverLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /ecs/flotorch-retriever-${TableSuffix}
-      RetentionInDays: 14
+      LogGroupName: !Sub /ecs/flotorch/retriever-${TableSuffix}
+      RetentionInDays: 7
 
   EvaluationLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /ecs/flotorch-evaluation-${TableSuffix}
-      RetentionInDays: 14
+      LogGroupName: !Sub /ecs/flotorch/evaluation-${TableSuffix}
+      RetentionInDays: 7
 
   IndexingTaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -156,7 +160,7 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: !Sub /ecs/flotorch-indexing-${TableSuffix}
+              awslogs-group: !Sub /ecs/flotorch/indexing-${TableSuffix}
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: flotorch-indexing
           Environment:
@@ -197,7 +201,7 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: !Sub /ecs/flotorch-retriever-${TableSuffix}
+              awslogs-group: !Sub /ecs/flotorch/retriever-${TableSuffix}
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: flotorch-retriever
           Environment:
@@ -239,7 +243,7 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: !Sub /ecs/flotorch-evaluation-${TableSuffix}
+              awslogs-group: !Sub /ecs/flotorch/evaluation-${TableSuffix}
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: flotorch-evaluation
           Environment:

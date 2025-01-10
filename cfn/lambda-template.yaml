@@ -54,6 +54,12 @@ Parameters:
   AiRepositoryUri:
     Type: String
     Description: URI for the AI repository
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: First public subnet ID
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: First private subnet ID
   IndexingImageTag:
     Type: String
     Description: Tag for the indexing image
@@ -244,6 +250,7 @@ Resources:
                           InstanceType='t2.large',
                           MinCount=1,
                           MaxCount=1,
+                          SubnetId=event['ResourceProperties']['PublicSubnet1'],
                           BlockDeviceMappings=[{
                               'DeviceName': '/dev/xvda',
                               'Ebs': {
@@ -478,6 +485,8 @@ Resources:
       EvaluationRepositoryUri: !Ref EvaluationRepositoryUri
       RuntimeRepositoryUri: !Ref RuntimeRepositoryUri
       AiRepositoryUri: !Ref AiRepositoryUri
+      PublicSubnet1: !Ref PublicSubnet1
+      PrivateSubnet1: !Ref PrivateSubnet1
       IndexingImageTag: !Ref IndexingImageTag
       RetrieverImageTag: !Ref RetrieverImageTag
       AppImageTag: !Ref AppImageTag
