@@ -204,12 +204,15 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS: '*'
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
             Action:
               - s3:*
             Resource:
               - !Sub "arn:aws:s3:::${DataBucket}"
               - !Sub "arn:aws:s3:::${DataBucket}/*"
+            Condition:
+              StringEquals:
+                aws:PrincipalAccount: !Ref AWS::AccountId
 
   CopyBedrockLimitsFunction:
     Type: AWS::Lambda::Function
