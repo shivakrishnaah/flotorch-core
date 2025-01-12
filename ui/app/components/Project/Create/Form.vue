@@ -73,7 +73,7 @@ const nextStep = () => {
             label: pc.label
           }
         }),
-        rerank_model_id: state.retrieval?.rerank_model_id,
+        rerank_model_id: state.prestep?.region === 'us-east-1' ? ['none'] : state.retrieval?.rerank_model_id,
       },
       evaluation: {
         evaluation: [
@@ -115,13 +115,13 @@ const steps = [
   <div>
     <div class="relative my-8">
       <!-- Progress bar -->
-      <div class="absolute top-6 left-14 right-14 h-[2px] bg-gray-200">
+      <div class="absolute top-6 left-16 right-16 h-[2px] bg-gray-200">
         <div class="h-full bg-gray-600 transition-all duration-300 ease-in-out"
           :style="{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }" />
       </div>
 
       <!-- Steps -->
-      <div class="relative flex justify-between px-4">
+      <div class="relative flex justify-between px-1">
         <div v-for="(step, index) in steps" :key="index" class="flex flex-col items-center gap-2"
           :class="{ 'text-gray-900': currentStep > index || currentStep === index + 1, 'text-gray-400': currentStep < index + 1 }">
           <div
