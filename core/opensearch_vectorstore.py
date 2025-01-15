@@ -21,9 +21,9 @@ class OpenSearchVectorDatabase(VectorDatabase):
                 
                 # Initialize OpenSearch client for serverless
                 self.client = OpenSearch(
-                    hosts=[{'host': host, 'port': port}],
+                    hosts=[{'host': 'localhost', 'port': '9200'}],
                     http_auth=auth,
-                    use_ssl=True,  
+                    use_ssl=False,  
                     verify_certs=True,
                     connection_class=RequestsHttpConnection,
                     timeout=30,
@@ -40,10 +40,10 @@ class OpenSearchVectorDatabase(VectorDatabase):
                 raise
         else:
             self.client = OpenSearch(
-                hosts=[{'host': host, 'port': port}],
-                http_auth=(username, password),
-                use_ssl=use_ssl,
-                verify_certs=True,
+                hosts=[{'host': 'localhost', 'port': '9200'}],
+                http_auth=('admin', 'Test@password42'),
+                use_ssl=False,
+                verify_certs=False,
                 connection_class=RequestsHttpConnection,
                 timeout=30,
                 max_retries=3,

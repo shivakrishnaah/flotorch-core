@@ -68,8 +68,8 @@ if config.opensearch_serverless:
         
         # Initialize OpenSearch client for serverless
         client = OpenSearch(
-            hosts=[{'host': 'localhost', 'port': 80}],
-            http_auth=('admin', 'Flotorch@123'),
+            hosts=[{'host': 'localhost', 'port': 9200}],
+            http_auth=('admin', 'Test@password42'),
             use_ssl=True,  
             verify_certs=False,
             connection_class=RequestsHttpConnection,
@@ -87,9 +87,9 @@ if config.opensearch_serverless:
         raise
 else:
     client = OpenSearch(
-        hosts=[{'host': 'localhost', 'port': 80}],
-        http_auth=('admin', 'Flotorch@123'),
-        use_ssl=True,
+        hosts=[{'host': 'localhost', 'port': 9200}],
+        http_auth=('admin', 'Test@password42'),
+        use_ssl=False,
         verify_certs=False,
         connection_class=RequestsHttpConnection,
         timeout=30,
