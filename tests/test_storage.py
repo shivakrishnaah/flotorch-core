@@ -20,7 +20,7 @@ class TestLocalStorageProvider(unittest.TestCase):
     def test_read(self, mock_isdir, mock_open):
         provider = LocalStorageProvider()
         result = list(provider.read('test_path'))
-        mock_open.assert_called_once_with('test_path', 'r')
+        mock_open.assert_called_once_with('test_path', 'rb')
         self.assertEqual(result, ['test_data'])
 
 
