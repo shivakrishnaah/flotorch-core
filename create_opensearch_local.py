@@ -7,14 +7,14 @@ from config.config import get_config
 def create_index(client, index_name):
     vector_field = 'vectors'
 
-    # Delete index if it exists
+    # Delete indexing if it exists
     if client.indices.exists(index=index_name):
-        print(f"Deleting existing index {index_name}")
+        print(f"Deleting existing indexing {index_name}")
         client.indices.delete(index=index_name)
 
     index_body = {
         "settings": {
-            "index": {
+            "indexing": {
                 "knn": True,
                 "knn.algo_param.ef_search": 512
             }
@@ -38,8 +38,8 @@ def create_index(client, index_name):
         }
     }
 
-    # Create the index
-    print(f"Creating index {index_name}")
+    # Create the indexing
+    print(f"Creating indexing {index_name}")
     response = client.indices.create(index=index_name, body=index_body)
     print("Index creation response:", response)
 
@@ -99,7 +99,7 @@ else:
 
 # Index configuration
 indices = [
-    'local-index-3584'
+    'local-indexing-3584'
 ]
 
 for index in indices:
