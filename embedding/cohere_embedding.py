@@ -1,6 +1,7 @@
-from .bedrock_embedding import BedRockEmbedding
+from typing import Dict
+
 from chunking.chunking import Chunk
-from typing import List, Dict
+from .bedrock_embedding import BedRockEmbedding
 
 
 class CohereEmbedding(BedRockEmbedding):

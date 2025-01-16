@@ -1,6 +1,9 @@
-from storage.storage import StorageProvider
 import io
+
 from PyPDF2 import PdfReader
+
+from storage.storage import StorageProvider
+
 
 class PDFReader:
     def __init__(self, storage_provider: StorageProvider):

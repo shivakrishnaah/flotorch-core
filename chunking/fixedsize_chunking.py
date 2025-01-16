@@ -1,12 +1,15 @@
-from .chunking import BaseChunker, Chunk
 from typing import List
+
 from langchain.text_splitter import CharacterTextSplitter
+
+from .chunking import BaseChunker, Chunk
+
 
 class FixedSizeChunker(BaseChunker):
     def __init__(self, chunk_size: int, chunk_overlap: int):
         super().__init__()
         self.chunk_size = self.tokens_per_charecter * chunk_size
-        self.chunk_overlap = int (chunk_overlap * self.chunk_size / 100)
+        self.chunk_overlap = int(chunk_overlap * self.chunk_size / 100)
         if self.chunk_size <= 0:
             raise ValueError("chunk_size must be positive")
         if self.chunk_overlap >= self.chunk_size:

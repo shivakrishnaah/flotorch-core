@@ -1,8 +1,10 @@
-from .embedding import BaseEmbedding, Embeddings, EmbeddingMetadata
-import boto3
-from chunking.chunking import Chunk
-from typing import List, Dict, Any
 import json
+from typing import List, Dict, Any
+
+import boto3
+
+from chunking.chunking import Chunk
+from .embedding import BaseEmbedding, Embeddings, EmbeddingMetadata
 
 
 class BedRockEmbedding(BaseEmbedding):
@@ -46,6 +48,7 @@ class BedRockEmbedding(BaseEmbedding):
 
     def extract_embedding(self, response: Dict[str, Any]) -> List[float]:
         return response["embeddings"][0]
+
 
 class TitanV2Embedding(BedRockEmbedding):
 

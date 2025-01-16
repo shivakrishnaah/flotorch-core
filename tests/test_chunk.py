@@ -1,7 +1,9 @@
 import unittest
+
 from chunking.chunking import Chunk
 from chunking.fixedsize_chunking import FixedSizeChunker
 from chunking.hierarical_chunking import HieraricalChunker
+
 
 class TestChunk(unittest.TestCase):
     def test_chunk_initialization(self):
@@ -97,5 +99,7 @@ class TestHieraricalChunk(unittest.TestCase):
         self.assertIsInstance(parent_chunk, Chunk)
         self.assertIsInstance(parent_chunk.child_data, list)
         self.assertGreater(len(parent_chunk.child_data), 0)
+
+
 if __name__ == "__main__":
     unittest.main()

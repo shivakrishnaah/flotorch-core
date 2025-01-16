@@ -1,6 +1,6 @@
-from reader.pdf_reader import  PDFReader
 from chunking.chunking import BaseChunker
 from embedding.embedding import BaseEmbedding
+from reader.pdf_reader import PDFReader
 
 
 class Index:

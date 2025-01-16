@@ -1,7 +1,10 @@
 from typing import List
+
+from langchain.text_splitter import CharacterTextSplitter
+
 from chunking.chunking import Chunk
 from chunking.fixedsize_chunking import FixedSizeChunker
-from langchain.text_splitter import CharacterTextSplitter
+
 
 class HieraricalChunker(FixedSizeChunker):
     def __init__(self, chunk_size: int, chunk_overlap: int, parent_chunk_size: int):
@@ -20,7 +23,7 @@ class HieraricalChunker(FixedSizeChunker):
         self.parent_text_splitter = CharacterTextSplitter(
             separator=self.space,
             chunk_size=self.parent_chunk_size,
-            chunk_overlap=0, # Can change this at a later point of time
+            chunk_overlap=0,  # Can change this at a later point of time
             length_function=len,
             is_separator_regex=False
         )

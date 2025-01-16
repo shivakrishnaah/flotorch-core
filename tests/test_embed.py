@@ -1,8 +1,9 @@
 import unittest
+
+from chunking.chunking import Chunk
 from embedding.cohere_embedding import CohereEmbedding
 from embedding.titanv1_embedding import TitanV1Embedding
 from embedding.titanv2_embedding import TitanV2Embedding
-from chunking.chunking import Chunk
 
 
 class TestCohereEmbed(unittest.TestCase):
@@ -13,6 +14,7 @@ class TestCohereEmbed(unittest.TestCase):
         chunk = Chunk(data="test data")
         payload = self.embedder._prepare_chunk(chunk)
         self.assertEqual(payload, {"texts": ["test data"], "input_type": "search_document"})
+
 
 class TestTitanV1Embed(unittest.TestCase):
     def setUp(self):
@@ -28,6 +30,7 @@ class TestTitanV1Embed(unittest.TestCase):
         embedding = self.embedder.extract_embedding(response)
         self.assertEqual(embedding, [0.1, 0.2, 0.3])
 
+
 class TestTitanV2Embed(unittest.TestCase):
     def setUp(self):
         self.embedder = TitanV2Embedding(model_id="test_model", region="us-west-2")
@@ -41,6 +44,7 @@ class TestTitanV2Embed(unittest.TestCase):
         response = {"embedding": [0.1, 0.2, 0.3]}
         embedding = self.embedder.extract_embedding(response)
         self.assertEqual(embedding, [0.1, 0.2, 0.3])
+
 
 if __name__ == '__main__':
     unittest.main()

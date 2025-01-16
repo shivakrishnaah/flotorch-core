@@ -1,8 +1,9 @@
 import unittest
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import patch, mock_open
+
 from storage.local_storage import LocalStorageProvider
 from storage.s3_storage import S3StorageProvider
-from reader.pdf_reader import PDFReader
+
 
 class TestLocalStorageProvider(unittest.TestCase):
 
@@ -22,6 +23,7 @@ class TestLocalStorageProvider(unittest.TestCase):
         mock_open.assert_called_once_with('test_path', 'r')
         self.assertEqual(result, ['test_data'])
 
+
 class TestS3StorageProvider(unittest.TestCase):
 
     @patch('boto3.client')
@@ -31,7 +33,9 @@ class TestS3StorageProvider(unittest.TestCase):
 
     def test_write(self):
         self.provider.write('/tmp/test_path.data', 'test_data')
-        self.mock_s3_client.put_object.assert_called_once_with(Bucket='test_bucket', Key='/tmp/test_path.data', Body='test_data')
+        self.mock_s3_client.put_object.assert_called_once_with(Bucket='test_bucket', Key='/tmp/test_path.data',
+                                                               Body='test_data')
+
 
 # class TestPDFReader(unittest.TestCase):
 #

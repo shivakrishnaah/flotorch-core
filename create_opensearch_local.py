@@ -1,8 +1,9 @@
-import boto3
-from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
-from dotenv import load_dotenv
 import os
+
+import boto3
 from config.config import get_config
+from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
+
 
 def create_index(client, index_name):
     vector_field = 'vectors'
@@ -47,6 +48,7 @@ def create_index(client, index_name):
     mapping = client.indices.get_mapping(index=index_name)
     print("\nIndex mapping:", mapping)
 
+
 config = get_config()
 
 # OpenSearch client setup
@@ -65,12 +67,12 @@ if config.opensearch_serverless:
         credentials = boto3.Session().get_credentials()
         # Create AWS V4 Signer Auth for OpenSearch Serverless
         auth = AWSV4SignerAuth(credentials, region, 'aoss')
-        
+
         # Initialize OpenSearch client for serverless
         client = OpenSearch(
             hosts=[{'host': 'localhost', 'port': 9200}],
             http_auth=('admin', 'Test@password42'),
-            use_ssl=True,  
+            use_ssl=True,
             verify_certs=False,
             connection_class=RequestsHttpConnection,
             timeout=30,
@@ -81,9 +83,9 @@ if config.opensearch_serverless:
                 'host': host
             }
         )
-        
+
     except Exception as e:
-        #logger.error(f"Failed to initialize OpenSearch Serverless client: {str(e)}", exc_info=True)
+        # logger.error(f"Failed to initialize OpenSearch Serverless client: {str(e)}", exc_info=True)
         raise
 else:
     client = OpenSearch(
