@@ -15,7 +15,7 @@ class S3StorageProvider(StorageProvider):
     S3 storage provider
     """
 
-    def __init__(self, bucket):
+    def __init__(self, bucket: str):
 
         """
         Initializes the S3Storage class with the specified S3 bucket.
@@ -30,7 +30,7 @@ class S3StorageProvider(StorageProvider):
         self.bucket = bucket
         self.s3_client = boto3.client('s3')
 
-    def write(self, path, data) -> None:
+    def write(self, path: str, data: bytes) -> None:
         """
         Writes data to the specified path in the S3 bucket.
         Args:
@@ -44,7 +44,7 @@ class S3StorageProvider(StorageProvider):
             key = path + "tmp.data"
         self.s3_client.put_object(Bucket=self.bucket, Key=key, Body=data)
 
-    def read(self, path) -> Generator[bytes, None, None]:
+    def read(self, path: str) -> Generator[bytes, None, None]:
         """
         Reads data from the specified path in the S3 bucket.
         Args:
@@ -59,7 +59,7 @@ class S3StorageProvider(StorageProvider):
             response = self.s3_client.get_object(Bucket=self.bucket, Key=path)
             yield response['Body'].read()
 
-    def _read_directory(self, path):
+    def _read_directory(self, path: str):
         """
         Reads all files in the specified directory in the S3 bucket.
         Args:

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "FloTorch"
+version = "2.0.0"
+description = "A Python project for FloTorch"
+authors = [
+    { name = "Shiva Krishna", email = "shiva.krishnaah@gmail.com" }
+]
+license = { text = "MIT" }
+dependencies = [
+    "torch",
+    "numpy",
+    "boto3",
+    "ollama"
+]
+
+[tool.setuptools]
+packages = ["FloTorch"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = E203, W503
+
+[tool.coverage.run]
+branch = True
+source = ["FloTorch"]
+
+[tool.coverage.report]
+show_missing = True

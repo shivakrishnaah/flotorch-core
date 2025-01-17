@@ -1,5 +1,5 @@
 from chunking.chunking import BaseChunker
-from embedding.embedding import BaseEmbedding
+from embedding.embedding import BaseEmbedding, Embeddings
 from reader.pdf_reader import PDFReader
 
 
@@ -9,7 +9,7 @@ class Index:
         self.chunker = chunker
         self.embedder = embedder
 
-    def index(self, path):
+    def index(self, path: str) -> list[Embeddings]:
         text = self.pdf_reader.read_pdf(path)
         chunks = self.chunker.chunk_list(text)
         embeddings = self.embedder.embed_list(chunks)

@@ -19,7 +19,7 @@ class LocalStorageProvider(StorageProvider):
         """
         super().__init__()
 
-    def write(self, path, data) -> None:
+    def write(self, path: str, data: bytes) -> None:
         """
         Writes data to the specified path in local storage.
         Args:
@@ -29,7 +29,7 @@ class LocalStorageProvider(StorageProvider):
         logger.info(f'Writing data to local storage: {data}')
         if os.path.isdir(path):
             path = os.path.join(path, 'tmp.data')
-        with open(path, 'w') as file:
+        with open(path, 'wb') as file:
             file.write(data)
 
     def read(self, path) -> Generator[bytes, None, None]:

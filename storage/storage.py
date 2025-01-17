@@ -12,7 +12,7 @@ class StorageProvider(ABC):
     """
 
     @abstractmethod
-    def write(self, path, data) -> None:
+    def write(self, path: str, data: bytes) -> None:
         """
         Writes data to the specified path.
         Args:
@@ -22,7 +22,7 @@ class StorageProvider(ABC):
         pass
 
     @abstractmethod
-    def read(self, path) -> Generator[bytes, None, None]:
+    def read(self, path: str) -> Generator[bytes, None, None]:
         """
         Reads data from the specified path.
         Args:
@@ -32,7 +32,7 @@ class StorageProvider(ABC):
         """
         pass
 
-    def read_as_string(self, path) -> Generator[str, None, None]:
+    def read_as_string(self, path: str) -> Generator[str, None, None]:
         """
         Reads data from the specified path and yields it as a string.
         Args:

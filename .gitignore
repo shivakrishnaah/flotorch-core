@@ -2,9 +2,10 @@
 .env
 start.py
 create_opensearch_local.py
-
+.idea*
 # Byte-compiled / optimized / DLL files
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 

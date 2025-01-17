@@ -1,5 +1,6 @@
 from chunking.fixedsize_chunking import FixedSizeChunker
 from embedding.bedrock_embedding import TitanV2Embedding
+from embedding.llama_embedding import LlamaEmbedding
 from indexing.indexing import Index
 from reader.pdf_reader import PDFReader
 from storage.local_storage import LocalStorageProvider
@@ -10,7 +11,8 @@ def main():
     storage_provider = LocalStorageProvider()
     pdf_reader = PDFReader(storage_provider)
     chunker = FixedSizeChunker(128, 5)
-    embedder = TitanV2Embedding('amazon.titan-embed-text-v2:0', 'us-east-1', 256, True)
+    embedder = LlamaEmbedding('llama3.3')
+    # embedder = TitanV2Embedding('amazon.titan-embed-text-v2:0', 'us-east-1', 256, True)
     index = Index(pdf_reader, chunker, embedder)
     # embeddings = index.index(path="0b48bc48-8a1a-42bc-9ee4-aa53380bb58d/kb_data/kb.pdf")
     embeddings = index.index(path="/Users/shivakrishna/Downloads/kb.pdf")
