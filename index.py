@@ -32,15 +32,9 @@ def main():
 
     # should this be included in Utils?
     bulk_data = []
-    for embedding in embeddings:
+    for embedding in embeddings.embeddings:
         bulk_data.append({"index": {"_index": config.get_opensearch_index()}})
-        bulk_data.append({
-            "embedding": embedding.embeddings,
-            "metadata": {
-                "input_tokens": embedding.metadata.input_tokens,
-                "latency_ms": embedding.metadata.latency_ms
-            }
-        })
+        bulk_data.append(embedding.to_dict())
 
     open_search_client.write_bulk(body=bulk_data)
 

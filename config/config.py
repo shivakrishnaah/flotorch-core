@@ -86,5 +86,5 @@ class Config:
         """
         input_data = self.provider.get("INPUT_DATA", {})
         if not input_data:
-            raise ValueError("input data is not set. Value not presnt in configuration")
+            raise ValueError("input data is not set. Value not present in configuration")
         return input_data

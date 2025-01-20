@@ -21,6 +21,12 @@ class BaseFargateTaskProcessor(ABC):
         self.task_token = task_token
         self.input_data = input_data
 
+    # TODO:  This is temporary
+    def _get_s3_bucket_and_path(self, s3_path):
+        uri = s3_path[len("s3://"):]
+        bucket, path = uri.split("/", 1)
+        return bucket, path
+
     @abstractmethod
     def process(self):
         """

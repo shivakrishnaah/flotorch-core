@@ -8,11 +8,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="10dd87aa-fc48-481c-84a6-51fe09870147" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/create_opensearch_local.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/StorageProvider.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/opensearch_vectorstore.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/opensearch_vectorstore.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/s3util.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/s3util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/create_opensearch_local.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/embedding/titanv2_embedding.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding/titanv2_embedding.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fargate/base_task_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/fargate/base_task_processor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fargate/indexing_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/fargate/indexing_processor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/indexing/indexing.py" beforeDir="false" afterPath="$PROJECT_DIR$/indexing/indexing.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +45,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "v1.1.0",
+    "git-widget-placeholder": "refactor/v1.1.0",
     "last_opened_file_path": "/Users/shivakrishna/Projects/Python/FloTorch",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "com.github.copilot.settings.ApplicationConfigurable"
@@ -77,5 +79,16 @@
       <updated>1735917369151</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

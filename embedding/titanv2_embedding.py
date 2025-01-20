@@ -15,7 +15,7 @@ class TitanV2Embedding(TitanV1Embedding):
     :param normalize: Normalize the embedding.
     """
 
-    def __init__(self, model_id: str, region: str, dimensions: int = 256, normalize: bool = True) -> None:
+    def __init__(self, model_id: str, region: str = "us-east-1", dimensions: int = 256, normalize: bool = True) -> None:
         super().__init__(model_id, region, dimensions, normalize)
 
     """
