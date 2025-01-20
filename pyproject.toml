@@ -11,22 +11,26 @@ authors = [
 ]
 license = { text = "MIT" }
 dependencies = [
-    "torch",
-    "numpy",
-    "boto3",
-    "ollama"
+    "langchain==0.3.14",
+    "boto3==1.36.2",
+    "ollama==0.4.6",
+    "PyPDF2==3.0.1",
+    "opensearch-py==2.8.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4", 
+    "testcontainers==4.9.0",
+    "minio==7.2.15",
+    "moto==5.0.27"
+    ]
+
 [tool.setuptools]
-packages = ["FloTorch"]
+# Slowly move the whole code to src so that on the higher level it looks clean
+# src = source code 
+# tests = Test code
+packages = { find = {} }  # Automatically finds all packages in your source.
 
 [tool.flake8]
 max-line-length = 88
-extend-ignore = E203, W503
-
-[tool.coverage.run]
-branch = True
-source = ["FloTorch"]
-
-[tool.coverage.report]
-show_missing = True

@@ -15,7 +15,7 @@ class S3StorageProvider(StorageProvider):
     S3 storage provider
     """
 
-    def __init__(self, bucket: str):
+    def __init__(self, bucket: str, s3_client = boto3.client('s3')):
 
         """
         Initializes the S3Storage class with the specified S3 bucket.
@@ -28,7 +28,7 @@ class S3StorageProvider(StorageProvider):
 
         super().__init__()
         self.bucket = bucket
-        self.s3_client = boto3.client('s3')
+        self.s3_client = s3_client
 
     def write(self, path: str, data: bytes) -> None:
         """

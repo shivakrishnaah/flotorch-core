@@ -1,13 +1,13 @@
 import os
 from opensearchpy import OpenSearch
-from storage.db.db_storage import DbStorage
+from storage.db.vector.vector_storage import VectorStorage
 from typing import List
 
 """
 This class is responsible for storing the data in the OpenSearch.
 """
 
-class OpenSearchClient(DbStorage):
+class OpenSearchClient(VectorStorage):
     def __init__(self, host, port, username, password, index, use_ssl=True, verify_certs=True, ssl_assert_hostname=False, ssl_show_warn=False):
         self.host = host
         self.port = port
@@ -28,10 +28,10 @@ class OpenSearchClient(DbStorage):
         return self.client.index(index=self.index, body=body)
     
     def read(self, body):
-        return self._search(self.index, body)
+        return self.search(self.index, body)
     
     def write_bulk(self, body: List[dict]):
         return self.client.bulk(body=body)
 
-    def _search(self, index, body):
-        return self.client.search(index=index, body=body)
+    def search(self, body):
+        return self.client.search(index=self.index, body=body)
