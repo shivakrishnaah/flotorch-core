@@ -48,7 +48,7 @@ class Config:
         """
         Retrieves the OpenSearch username from the configuration provider.
         """
-        open_search_username = self.provider.get("OPENSEARCH_USERNAME", "admin")
+        open_search_username = self.provider.get("OPENSEARCH_USERNAME")
         if not open_search_username:
             raise ValueError("OpenSearch username is not set. Value not presnt in configuration")
         return open_search_username
@@ -57,7 +57,7 @@ class Config:
         """
         Retrieves the OpenSearch password from the configuration provider.
         """
-        open_search_password = self.provider.get("OPENSEARCH_PASSWORD", "admin")
+        open_search_password = self.provider.get("OPENSEARCH_PASSWORD")
         if not open_search_password:
             raise ValueError("OpenSearch password is not set. Value not presnt in configuration")
         return open_search_password
@@ -66,8 +66,25 @@ class Config:
         """
         Retrieves the OpenSearch index name from the configuration provider.
         """
-        open_search_index = self.provider.get("OPENSEARCH_INDEX", "embeddings")
+        open_search_index = self.provider.get("OPENSEARCH_INDEX")
         if not open_search_index:
             raise ValueError("OpenSearch index is not set. Value not presnt in configuration")
         return open_search_index
 
+    def get_task_token(self) -> str:
+        """
+        Retrieves the task token from the configuration provider.
+        """
+        task_token = self.provider.get("TASK_TOKEN")
+        if not task_token:
+            raise ValueError("task token is not set. Value not presnt in configuration")
+        return task_token
+
+    def get_fargate_input_data(self) -> str:
+        """
+        Retrieves the input data for fargate handlers from the configuration provider.
+        """
+        input_data = self.provider.get("INPUT_DATA", {})
+        if not input_data:
+            raise ValueError("input data is not set. Value not presnt in configuration")
+        return input_data
