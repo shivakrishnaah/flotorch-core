@@ -37,8 +37,8 @@ class BedRockEmbedding(BaseEmbedding):
 
         headers = response['ResponseMetadata'].get('HTTPHeaders', {})
         return EmbeddingMetadata(
-            input_tokens=headers.get('x-amzn-bedrock-input-token-count', ''),
-            latency_ms=headers.get('x-amzn-bedrock-invocation-latency', '')
+            input_tokens=headers.get('x-amzn-bedrock-input-token-count', 0),
+            latency_ms=headers.get('x-amzn-bedrock-invocation-latency', 0)
         )
 
     def _parse_model_response(self, response: Dict[str, Any]) -> Dict[str, Any]:
@@ -47,16 +47,4 @@ class BedRockEmbedding(BaseEmbedding):
         return json.loads(response['body'].read())
 
     def extract_embedding(self, response: Dict[str, Any]) -> List[float]:
-        return response["embeddings"][0]
-
-
-class TitanV2Embedding(BedRockEmbedding):
-
-    def __init__(self, model_id: str, region: str, dimensions: int = 256, normalize: bool = True) -> None:
-        super().__init__(model_id, region, dimensions, normalize)
-
-    def _prepare_chunk(self, chunk: Chunk) -> Dict:
-        return {"inputText": chunk.data, "dimensions": self.dimension, "normalize": self.normalize}
-
-    def extract_embedding(self, response: Dict) -> List[float]:
-        return response["embedding"]
+        return response["embeddings"]

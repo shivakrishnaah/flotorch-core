@@ -15,6 +15,10 @@ class EmbeddingMetadata:
     def __init__(self, input_tokens: int, latency_ms: int):
         self.input_tokens = input_tokens
         self.latency_ms = latency_ms
+    
+    def append(self, metadata: 'EmbeddingMetadata'):
+        self.input_tokens += metadata.input_tokens
+        self.latency_ms += metadata.latency_ms
 
 
 class Embeddings:
@@ -26,6 +30,15 @@ class Embeddings:
     def __init__(self, embeddings: List[List[float]], metadata: EmbeddingMetadata):
         self.embeddings = embeddings
         self.metadata = metadata
+
+class EmbeddingList:
+    def __init__(self):
+        self.embeddings = []
+        self.metadata = EmbeddingMetadata(0, 0)
+
+    def append(self, embeddings: Embeddings):
+        self.embeddings.append(embeddings.embeddings)
+        self.metadata = self.metadata.append(embeddings.metadata)
 
 """
 This class is responsible for embedding the text."""
@@ -64,7 +77,10 @@ class BaseEmbedding(ABC):
     :param chunks: The list of chunks to be embedded.
     :return: The list of embeddings.
     """
-    def embed_list(self, chunks: List[Chunk]) -> List[Embeddings]:
+    def embed_list(self, chunks: List[Chunk]) -> EmbeddingList:
+        embedding_list = EmbeddingList()
         if not isinstance(chunks, list):
-            return [self.embed(chunks)]
-        return [self.embed(chunk) for chunk in chunks]
+            return embedding_list.append(self.embed(chunks))
+        for chunk in chunks:
+            embedding = self.embed(chunk)
+            embedding_list.append(embedding)

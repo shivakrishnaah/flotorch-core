@@ -8,4 +8,8 @@ class VectorStorage(DBStorage, ABC):
     @abstractmethod
     def search(self, body):
         pass
+
+    @abstractmethod
+    def embed_query(self, embedding, knn):
+        pass
     

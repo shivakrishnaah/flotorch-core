@@ -1,12 +1,12 @@
 from typing import List, Dict
 
 from chunking.chunking import Chunk
-from .bedrock_embedding import BedRockEmbedding
+from .titanv1_embedding import TitanV1Embedding
 
 """
 This class is responsible for embedding the text using the TitanV2 model.
 """
-class TitanV2Embedding(BedRockEmbedding):
+class TitanV2Embedding(TitanV1Embedding):
     """
     Initializes the TitanV2Embedding class.
     :param model_id: The model id of the TitanV2 model.
@@ -26,11 +26,3 @@ class TitanV2Embedding(BedRockEmbedding):
 
     def _prepare_chunk(self, chunk: Chunk) -> Dict:
         return {"inputText": chunk.data, "dimensions": self.dimension, "normalize": self.normalize}
-
-    """
-    Extracts the embedding from the response.
-    :param response: The response from the model.
-    :return: The embedding.
-    """
-    def extract_embedding(self, response: Dict) -> List[float]:
-        return response["embedding"]

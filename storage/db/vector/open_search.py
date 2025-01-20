@@ -35,3 +35,21 @@ class OpenSearchClient(VectorStorage):
 
     def search(self, body):
         return self.client.search(index=self.index, body=body)
+    
+    def embed_query(self, query_vector: List[float], knn: int):
+        vector_field = next((field for field, props in 
+                            self.client.indices.get_mapping(index=self.index)[self.index]['mappings']['properties'].items() 
+                            if 'type' in props and props['type'] == 'knn_vector'), None)
+        return {
+            "size": knn,
+            "query": {
+                "knn": {
+                    vector_field: {
+                        "vector": query_vector,
+                        "k": knn
+                    }
+                }
+            },
+            "_source": True,
+            "fields": ["text", "parent_id"]
+        }
