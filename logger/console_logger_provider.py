@@ -1,4 +1,4 @@
-from logger_provider import LoggerProvider
+from .logger_provider import LoggerProvider
 import logging
 
 class ConsoleLoggerProvider(LoggerProvider):

@@ -17,8 +17,8 @@ class EmbeddingMetadata:
         self.latency_ms = latency_ms
     
     def append(self, metadata: 'EmbeddingMetadata'):
-        self.input_tokens += metadata.input_tokens
-        self.latency_ms += metadata.latency_ms
+        self.input_tokens += int(metadata.input_tokens)
+        self.latency_ms += int(metadata.latency_ms)
 
 
 class Embeddings:
@@ -47,7 +47,7 @@ class EmbeddingList:
 
     def append(self, embeddings: Embeddings):
         self.embeddings.append(embeddings.embeddings)
-        self.metadata = self.metadata.append(embeddings.metadata)
+        self.metadata.append(embeddings.metadata)
 
 """
 This class is responsible for embedding the text."""
@@ -93,3 +93,5 @@ class BaseEmbedding(ABC):
         for chunk in chunks:
             embedding = self.embed(chunk)
             embedding_list.append(embedding)
+            
+        return embedding_list

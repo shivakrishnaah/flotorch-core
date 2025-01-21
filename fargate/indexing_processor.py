@@ -22,7 +22,15 @@ class IndexingProcessor(BaseFargateTaskProcessor):
     def process(self):
         logger.info("Starting indexing process.")
         try:
-            exp_config_data = self.input_data.get("experimentConfig", {})
+            # exp_config_data = self.input_data.get("experimentConfig", {})
+
+            exp_config_data = {
+                "kb_data": "s3://flotorch-data-paimon/9c32fdec-9e44-44a0-8870-ca8c3ec53ba9/kb_data/medical_abstracts_100_169kb.pdf",
+                "chunk_size": 128,
+                "chunk_overlap": 5,
+                "embedding_model": "amazon.titan-embed-text-v2:0",
+                "aws_region": "us-east-1"
+            }
             logger.info(f"Experiment config data: {exp_config_data}")
 
             kb_data = exp_config_data.get("kb_data")
@@ -41,7 +49,16 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             for embedding in embeddings_list.embeddings:
                 # TODO See this index also can be included in the to_dict method
                 bulk_data.append({"index": {"_index": config.get_opensearch_index()}})
-                bulk_data.append(embedding.to_dict())
+                # below code wont work as Embedding class is not inside the list, embedding array and metadata is extracted earlier from Embeddings class
+                # bulk_data.append(embedding.to_json())
+
+                bulk_data.append({
+                    "embedding": embedding,
+                    "metadata": {
+                        "input_tokens": embeddings_list.metadata.input_tokens,
+                        "latency_ms": embeddings_list.metadata.latency_ms
+                    }
+                })
             open_search_client.write_bulk(body=bulk_data)
             output = {"status": "success", "message": "Indexing completed successfully."}
             self.send_task_success(output)
