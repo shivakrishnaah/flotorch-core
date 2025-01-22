@@ -43,7 +43,7 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             embeddings_list = indexing.index(kb_data_path)
             open_search_client = OpenSearchClient(config.get_opensearch_host(), config.get_opensearch_port(),
                                            config.get_opensearch_username(), config.get_opensearch_password(),
-                                           config.get_opensearch_index())
+                                           exp_config_data.get("index_id"))
     
             bulk_data = []
             for embedding in embeddings_list.embeddings:
