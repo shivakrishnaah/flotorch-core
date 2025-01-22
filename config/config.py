@@ -39,7 +39,7 @@ class Config:
         """
         Retrieves the OpenSearch port from the configuration provider.
         """
-        open_search_port = int(self.provider.get("OPENSEARCH_PORT", 5000))
+        open_search_port = int(self.provider.get("OPENSEARCH_PORT", 443))
         if not open_search_port:
             raise ValueError("OpenSearch port is not set. Value not presnt in configuration")
         return open_search_port
