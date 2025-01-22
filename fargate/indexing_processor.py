@@ -1,4 +1,5 @@
 from chunking.fixedsize_chunking import FixedSizeChunker
+from chunking.hierarical_chunking import HieraricalChunker
 from embedding.titanv2_embedding import TitanV2Embedding
 from embedding.titanv1_embedding import TitanV1Embedding
 from fargate.base_task_processor import BaseFargateTaskProcessor
@@ -26,14 +27,15 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             # exp_config_data = self.input_data.get("experimentConfig", {})
 
             exp_config_data = {
-                "kb_data": "s3://flotorch-data-paimon/3ed177f6-2710-4b4f-8ae0-f0f378f70ae4/kb_data/medical_abstracts_100_169kb.pdf",
+                "kb_data": "s3://flotorch-data-paimon/0f5062ad-7dff-4daa-b924-b5a75a88ffa6/kb_data/medical_abstracts_100_169kb.pdf",
                 "chunk_size": 128,
                 "chunk_overlap": 5,
+                "parent_chunk_size": 512,
                 "embedding_model": "amazon.titan-embed-image-v1",
                 "aws_region": "us-east-1"
             }
 
-            index_id = "fcdi9_fix_128_5_b_amazontitanimagev1_256_hnsw"
+            index_id = "6w6qd_hi_none_none_b_amazontitanimagev1_256_hnsw"
 
             logger.info(f"Experiment config data: {exp_config_data}")
 
@@ -41,7 +43,7 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             kb_data_bucket, kb_data_path = self._get_s3_bucket_and_path(kb_data)
             s3_storage = S3StorageProvider(kb_data_bucket)
             pdf_reader = PDFReader(s3_storage)
-            chunking = FixedSizeChunker(exp_config_data.get("chunk_size"), exp_config_data.get("chunk_overlap"))
+            chunking = HieraricalChunker(exp_config_data.get("chunk_size"), exp_config_data.get("chunk_overlap"), exp_config_data.get("parent_chunk_size"))
             embedding = TitanV1Embedding(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"))
             indexing = Index(pdf_reader, chunking, embedding)
             embeddings_list = indexing.index(kb_data_path)
