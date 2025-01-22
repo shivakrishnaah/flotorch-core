@@ -1,9 +1,8 @@
 from embedding.embedding import BaseEmbedding
-from typing import List, Dict, Optional, Any
+from typing import List, Dict
 import boto3
 from chunking.chunking import Chunk
 from botocore.exceptions import ClientError
-from .guardrail_config import GuardrailCreateConfig
 from embedding.embedding import Embeddings, EmbeddingList
 
 
@@ -12,6 +11,7 @@ class GuardrailsEmbedding(BaseEmbedding):
     def __init__(self, base_embedding: BaseEmbedding, 
                  guardrail_id: str, 
                  guardrail_version: str):
+        super().__init__(base_embedding.dimension, base_embedding.normalize)
         self.base_embedding = base_embedding
         self.guardrail_id = guardrail_id
         self.guardrail_version = guardrail_version
@@ -61,17 +61,22 @@ class GuardrailsEmbedding(BaseEmbedding):
             print(f"Error applying guardrail: {str(e)}")
             raise
 
+    def _prepare_chunk(self, chunk: Chunk) -> Dict:
+        return self.base_embedding._prepare_chunk(chunk)
+
     """
     Embeds the chunk.
     :param chunk: The chunk to be embedded.
     :return: The embeddings.
     """
-    def embed(self, chunk: Chunk) -> Embeddings:
-        guardrail_response = self.apply_guardrail(content=[{'text': chunk.data}])
+    def embed(self, chunk: Chunk) -> Embeddings | None:
+        guardrail_response = self.apply_guardrail(content=chunk.data)
         if guardrail_response['action'] == 'GUARDRAIL_INTERVENED':
             # assessment = guardrail_response.get('assessments', [])
             modified_text = ' '.join(output['text'] for output in guardrail_response['outputs'])
-            self.base_embedding.embed(modified_text)
+            chunk.data = modified_text
+            return self.base_embedding.embed(chunk)
+        return None
 
     """
     Embeds the list of chunks.
@@ -84,5 +89,6 @@ class GuardrailsEmbedding(BaseEmbedding):
             return embedding_list.append(self.embed(chunks))
         for chunk in chunks:
             embedding = self.embed(chunk)
-            embedding_list.append(embedding)
+            if not embedding is None:
+                embedding_list.append(embedding)
         return embedding_list
