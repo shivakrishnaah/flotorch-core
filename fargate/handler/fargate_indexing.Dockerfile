@@ -4,10 +4,10 @@ FROM --platform=linux/amd64 python:3.9-slim
 # Create and set the working directory inside the container
 WORKDIR /var/task
 
-COPY requirements.txt .
+COPY pyproject.toml .
 
 # Install dependencies into the /var/task directory (where Lambda expects them)
-RUN pip install --no-cache-dir -r requirements.txt --target .
+RUN pip install .
 
 # Copy the necessary files and directories
 COPY chunking/ chunking/
