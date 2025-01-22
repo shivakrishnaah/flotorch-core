@@ -1,5 +1,6 @@
 from chunking.fixedsize_chunking import FixedSizeChunker
 from embedding.titanv2_embedding import TitanV2Embedding
+from embedding.titanv1_embedding import TitanV1Embedding
 from fargate.base_task_processor import BaseFargateTaskProcessor
 from logger.global_logger import get_logger
 from reader.pdf_reader import PDFReader
@@ -38,7 +39,7 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             s3_storage = S3StorageProvider(kb_data_bucket)
             pdf_reader = PDFReader(s3_storage)
             chunking = FixedSizeChunker(exp_config_data.get("chunk_size"), exp_config_data.get("chunk_overlap"))
-            embedding = TitanV2Embedding(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"))
+            embedding = TitanV1Embedding(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"))
             indexing = Index(pdf_reader, chunking, embedding)
             embeddings_list = indexing.index(kb_data_path)
             open_search_client = OpenSearchClient(config.get_opensearch_host(), config.get_opensearch_port(),
