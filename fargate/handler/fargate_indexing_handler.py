@@ -18,6 +18,7 @@ def get_environment_data():
         tuple: Task token (str) and input data (dict).
     """
     task_token = config.get_task_token()
+    logger.info(f"task token: {task_token}")
 
     input_data = config.get_fargate_input_data()
     try:

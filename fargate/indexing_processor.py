@@ -22,15 +22,15 @@ class IndexingProcessor(BaseFargateTaskProcessor):
     def process(self):
         logger.info("Starting indexing process.")
         try:
-            # exp_config_data = self.input_data.get("experimentConfig", {})
+            exp_config_data = self.input_data.get("experimentConfig", {})
 
-            exp_config_data = {
-                "kb_data": "s3://flotorch-data-paimon/9c32fdec-9e44-44a0-8870-ca8c3ec53ba9/kb_data/medical_abstracts_100_169kb.pdf",
-                "chunk_size": 128,
-                "chunk_overlap": 5,
-                "embedding_model": "amazon.titan-embed-text-v2:0",
-                "aws_region": "us-east-1"
-            }
+            # exp_config_data = {
+            #     "kb_data": "s3://flotorch-data-paimon/9c32fdec-9e44-44a0-8870-ca8c3ec53ba9/kb_data/medical_abstracts_100_169kb.pdf",
+            #     "chunk_size": 128,
+            #     "chunk_overlap": 5,
+            #     "embedding_model": "amazon.titan-embed-text-v2:0",
+            #     "aws_region": "us-east-1"
+            # }
             logger.info(f"Experiment config data: {exp_config_data}")
 
             kb_data = exp_config_data.get("kb_data")
