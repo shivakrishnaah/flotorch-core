@@ -23,15 +23,18 @@ class IndexingProcessor(BaseFargateTaskProcessor):
     def process(self):
         logger.info("Starting indexing process.")
         try:
-            exp_config_data = self.input_data.get("experimentConfig", {})
+            # exp_config_data = self.input_data.get("experimentConfig", {})
 
-            # exp_config_data = {
-            #     "kb_data": "s3://flotorch-data-paimon/9c32fdec-9e44-44a0-8870-ca8c3ec53ba9/kb_data/medical_abstracts_100_169kb.pdf",
-            #     "chunk_size": 128,
-            #     "chunk_overlap": 5,
-            #     "embedding_model": "amazon.titan-embed-text-v2:0",
-            #     "aws_region": "us-east-1"
-            # }
+            exp_config_data = {
+                "kb_data": "s3://flotorch-data-paimon/3ed177f6-2710-4b4f-8ae0-f0f378f70ae4/kb_data/medical_abstracts_100_169kb.pdf",
+                "chunk_size": 128,
+                "chunk_overlap": 5,
+                "embedding_model": "amazon.titan-embed-image-v1",
+                "aws_region": "us-east-1"
+            }
+
+            index_id = "fcdi9_fix_128_5_b_amazontitanimagev1_256_hnsw"
+
             logger.info(f"Experiment config data: {exp_config_data}")
 
             kb_data = exp_config_data.get("kb_data")
@@ -44,7 +47,7 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             embeddings_list = indexing.index(kb_data_path)
             open_search_client = OpenSearchClient(config.get_opensearch_host(), config.get_opensearch_port(),
                                            config.get_opensearch_username(), config.get_opensearch_password(),
-                                           exp_config_data.get("index_id"))
+                                           index_id)
     
             bulk_data = []
             for embedding in embeddings_list.embeddings:
