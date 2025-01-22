@@ -93,5 +93,4 @@ class BaseEmbedding(ABC):
         for chunk in chunks:
             embedding = self.embed(chunk)
             embedding_list.append(embedding)
-            
         return embedding_list
