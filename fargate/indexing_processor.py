@@ -58,13 +58,7 @@ class IndexingProcessor(BaseFargateTaskProcessor):
                 # below code wont work as Embedding class is not inside the list, embedding array and metadata is extracted earlier from Embeddings class
                 # bulk_data.append(embedding.to_json())
 
-                bulk_data.append({
-                    "embedding": embedding,
-                    "metadata": {
-                        "input_tokens": embeddings_list.metadata.input_tokens,
-                        "latency_ms": embeddings_list.metadata.latency_ms
-                    }
-                })
+                bulk_data.append(embedding.to_json())
             open_search_client.write_bulk(body=bulk_data)
             output = {"status": "success", "message": "Indexing completed successfully."}
             self.send_task_success(output)

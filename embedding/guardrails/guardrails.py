@@ -7,7 +7,7 @@ from .guardrail_config import GuardrailCreateConfig
 from embedding.embedding import Embeddings, EmbeddingList
 
 
-class GuardrailsEmbedding:
+class GuardrailsEmbedding(BaseEmbedding):
 
     def __init__(self, base_embedding: BaseEmbedding, 
                  guardrail_id: str, 
@@ -59,34 +59,6 @@ class GuardrailsEmbedding:
 
         except ClientError as e:
             print(f"Error applying guardrail: {str(e)}")
-            raise
-
-
-    def create_guardrail(
-            self,
-            guardrail_config: GuardrailCreateConfig
-    ) -> Dict:
-        """
-        Create a comprehensive guardrail using Amazon Bedrock
-        
-        Args:
-            name: Name of the guardrail
-            description: Description of the guardrail
-            content_policy: Content policy configuration
-            topic_policy: Topic policy configuration
-            word_policy: Word policy configuration
-            sensitive_info_policy: Sensitive information policy configuration
-            contextual_grounding_policy: Contextual grounding policy configuration
-            input_filter: Input filtering configuration
-            output_filter: Output filtering configuration
-        """
-        try:
-
-            response = self.bedrock_client.create_guardrail(**guardrail_config)
-            return response
-
-        except ClientError as e:
-            print(f"Error creating guardrail: {str(e)}")
             raise
 
     """

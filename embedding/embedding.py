@@ -32,12 +32,12 @@ class Embeddings:
         self.metadata = metadata
 
     def to_json(self) -> Dict:
-        return {
-            "embeddings": self.embeddings,
+        {
+            "embedding": self.embedding,
             "metadata": {
-                "input_tokens": self.metadata.input_tokens,
-                "latency_ms": self.metadata.latency_ms
-            }
+                    "input_tokens": self.metadata.input_tokens,
+                    "latency_ms": self.metadata.latency_ms
+                }
         }
 
 class EmbeddingList:
@@ -46,7 +46,7 @@ class EmbeddingList:
         self.metadata = EmbeddingMetadata(0, 0)
 
     def append(self, embeddings: Embeddings):
-        self.embeddings.append(embeddings.embeddings)
+        self.embeddings.append(embeddings)
         self.metadata.append(embeddings.metadata)
 
 """
