@@ -19,7 +19,7 @@ class JSONReader:
     :return: The JSON data.
     """
     def read(self, path:str) -> dict:
-        data = self.storage_provider.read(path)
+        data = "".join(chunk.decode("utf-8") for chunk in self.storage_provider.read(path))
         return json.loads(data)
     
     """
@@ -30,4 +30,8 @@ class JSONReader:
     """
     def read_as_model(self, path: str, model_class: type) -> object:
         data = self.read(path)
+
+        if isinstance(data, list):
+            return [model_class(**item) for item in data]
+        
         return model_class(**data)

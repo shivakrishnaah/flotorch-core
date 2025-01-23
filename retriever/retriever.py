@@ -20,9 +20,9 @@ class Retriever:
 
     def retrieve(self, path: str, query: str, knn: int):
        
-        questions_list = self.json_reader.read_as_model(path, List[Question])
+        questions_list = self.json_reader.read_as_model(path, Question)
         for question in questions_list:
             question_chunk = question.get_chunk()
             question_embedding = self.embedding.embed(question_chunk)
             query = self.vector_storage.embed_query(question_embedding, knn)
-            response =self.vector_storage.search(query)
+            response = self.vector_storage.search(query)
