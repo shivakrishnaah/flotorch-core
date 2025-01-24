@@ -31,6 +31,7 @@ class RetrieverProcessor(BaseFargateTaskProcessor):
                 "aws_region": "us-east-1",
                 "gt_data": "s3://flotorch-data-paimon/0f5062ad-7dff-4daa-b924-b5a75a88ffa6/gt_data/gt.json",
                 "knn_num": 5,
+                "vector_dimension": 1024
             }
 
             index_id = "local-index-1024"
@@ -39,7 +40,7 @@ class RetrieverProcessor(BaseFargateTaskProcessor):
             gt_data_bucket, gt_data_path = self._get_s3_bucket_and_path(gt_data)
             s3_storage = S3StorageProvider(gt_data_bucket)
             json_reader = JSONReader(s3_storage)
-            embedding = TitanV2Embedding(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"))
+            embedding = TitanV2Embedding(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"), exp_config_data.get("vector_dimension"))
 
             open_search_client = OpenSearchClient(config.get_opensearch_host(), config.get_opensearch_port(),
                                            config.get_opensearch_username(), config.get_opensearch_password(),

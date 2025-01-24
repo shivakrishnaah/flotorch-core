@@ -24,5 +24,5 @@ class Retriever:
         for question in questions_list:
             question_chunk = question.get_chunk()
             question_embedding = self.embedding.embed(question_chunk)
-            query = self.vector_storage.embed_query(question_embedding, knn)
+            query = self.vector_storage.embed_query(question_embedding.embeddings, knn)
             response = self.vector_storage.search(query)
