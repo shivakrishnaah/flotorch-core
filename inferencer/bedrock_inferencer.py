@@ -29,6 +29,7 @@ class BedrockInferencer(BaseInferencer):
             region_name=region
         )
 
+    # TODO: retry needs to be implemented
     def generate_text(self, user_query: str, context: List[Dict]) -> Tuple[Dict[Any, Any], str]:
         """
         Generate a response based on the user query and context using Bedrock.

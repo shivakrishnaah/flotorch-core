@@ -1,3 +1,4 @@
+from embedding.embedding_factory import EmbeddingFactory
 from fargate.base_task_processor import BaseFargateTaskProcessor
 from logger.global_logger import get_logger
 from config.config import Config
@@ -63,13 +64,28 @@ class RetrieverProcessor(BaseFargateTaskProcessor):
             storage = StorageProviderFactory.create_storage_provider(gt_data)
             gt_data_path = storage.get_path(gt_data)
             json_reader = JSONReader(storage)
-            embedding = TitanV2Embedding(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"), exp_config_data.get("vector_dimension"))
-
-            open_search_client = OpenSearchClient(config.get_opensearch_host(), config.get_opensearch_port(),
-                                           config.get_opensearch_username(), config.get_opensearch_password(),
-                                           index_id)
             
-            inferencer = BedrockInferencer(exp_config_data.get("retrieval_model"), exp_config_data.get("aws_region"), exp_config_data.get("n_shot_prompts"), exp_config_data.get("temp_retrieval_llm"), exp_config_data.get("n_shot_prompt_guide_obj"))
+            embedding = EmbeddingFactory.create_embedding(
+                exp_config_data.get("embedding_model"),
+                exp_config_data.get("aws_region"),
+                exp_config_data.get("vector_dimension")
+            )
+            open_search_client = OpenSearchClient(
+                config.get_opensearch_host(), 
+                config.get_opensearch_port(),
+                config.get_opensearch_username(), 
+                config.get_opensearch_password(),
+                index_id
+            )
+            
+            # TODO: is different model class required for retrieval model?
+            inferencer = BedrockInferencer(
+                exp_config_data.get("retrieval_model"), 
+                exp_config_data.get("aws_region"), 
+                exp_config_data.get("n_shot_prompts"), 
+                exp_config_data.get("temp_retrieval_llm"), 
+                exp_config_data.get("n_shot_prompt_guide_obj")
+            )
 
             retriever = Retriever(json_reader, embedding, open_search_client, inferencer)
             retriever.retrieve(gt_data_path, "What is the patient's name?", exp_config_data.get("knn_num"))
