@@ -1,11 +1,13 @@
 from typing import List, Dict
 
 from chunking.chunking import Chunk
+from .embedding_registry import register
 from .titanv1_embedding import TitanV1Embedding
 
 """
 This class is responsible for embedding the text using the TitanV2 model.
 """
+@register("amazon.titan-embed-text-v2")
 class TitanV2Embedding(TitanV1Embedding):
     """
     Initializes the TitanV2Embedding class.

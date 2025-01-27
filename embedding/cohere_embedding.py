@@ -1,11 +1,16 @@
-from typing import Dict
+from typing import Dict, List
 
 from chunking.chunking import Chunk
 from .bedrock_embedding import BedRockEmbedding
+from .embedding_registry import register
 
 """
 This class is responsible for embedding the text using the Cohere model.
 """
+@register("cohere.embed-multilingual-v3")
+@register("cohere.embed-english-v3")
+@register("cohere.embed-english-light-v3")
+@register("cohere.embed-multilingual-light-v3")
 class CohereEmbedding(BedRockEmbedding):
     """
     Initializes the CohereEmbedding class.

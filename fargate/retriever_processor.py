@@ -1,4 +1,4 @@
-from embedding.embedding_factory import EmbeddingFactory
+from embedding.embedding_registry import EmbeddingFactory
 from fargate.base_task_processor import BaseFargateTaskProcessor
 from logger.global_logger import get_logger
 from config.config import Config

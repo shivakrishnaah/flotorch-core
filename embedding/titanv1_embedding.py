@@ -2,8 +2,10 @@ from typing import List, Dict
 
 from chunking.chunking import Chunk
 from .bedrock_embedding import BedRockEmbedding
+from .embedding_registry import register
 
 
+@register("amazon.titan-embed-text-v1")
 class TitanV1Embedding(BedRockEmbedding):
     """
     Initializes the TitanV1Embedding class.

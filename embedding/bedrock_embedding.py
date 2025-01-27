@@ -1,6 +1,6 @@
 import json
 from typing import List, Dict, Any
-
+from abc import abstractmethod
 import boto3
 
 from chunking.chunking import Chunk
@@ -9,9 +9,7 @@ from .embedding import BaseEmbedding, Embeddings, EmbeddingMetadata
 
 class BedRockEmbedding(BaseEmbedding):
     def __init__(self, model_id: str, region: str, dimensions: int = 256, normalize: bool = True) -> None:
-        super().__init__(dimensions, normalize)
-        self.model_id = model_id
-        self.region = region
+        super().__init__(model_id, region, dimensions, normalize)
         self._application_json = "application/json"
         self.client = boto3.client("bedrock-runtime", region_name=self.region)
 
@@ -48,3 +46,7 @@ class BedRockEmbedding(BaseEmbedding):
 
     def extract_embedding(self, response: Dict[str, Any]) -> List[float]:
         return response["embeddings"]
+
+    @abstractmethod
+    def models_supported(self) -> List[str]:
+        pass

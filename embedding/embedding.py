@@ -58,8 +58,10 @@ class BaseEmbedding(ABC):
     :param normalize: Normalize the embedding.
     """
 
-    def __init__(self, dimensions: int = 256, normalize: bool = True) -> None:
+    def __init__(self,  model_id: str, region: str, dimensions: int = 256, normalize: bool = True) -> None:
         super().__init__()
+        self.model_id = model_id
+        self.region = region
         self.dimension = dimensions
         self.normalize = normalize
 

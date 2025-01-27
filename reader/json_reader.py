@@ -1,5 +1,6 @@
 import json
 from storage.storage import StorageProvider
+from typing import List
 
 """
 This class is responsible for reading the JSON data from the storage.
@@ -28,10 +29,10 @@ class JSONReader:
     :param model_class: The class of the model to convert the JSON data to.
     :return: The model object.
     """
-    def read_as_model(self, path: str, model_class: type) -> object:
+    def read_as_model(self, path: str, model_class: type) -> List[object]:
         data = self.read(path)
 
         if isinstance(data, list):
             return [model_class(**item) for item in data]
         
-        return model_class(**data)
+        return [model_class(**data)]
