@@ -19,7 +19,7 @@ COPY logger/ logger/
 COPY reader/ reader/
 COPY retriever/ retriever/
 COPY storage/ storage/
-COPY fargate/handler/fargate_indexing_handler.py .
+COPY fargate/handler/indexing/fargate_indexing_handler.py .
 
 # Set environment variables
 ENV PYTHONPATH=/var/task

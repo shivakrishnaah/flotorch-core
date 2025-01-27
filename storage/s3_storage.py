@@ -1,9 +1,8 @@
 import logging
 import os
 from typing import Generator
-
+from urllib.parse import urlparse
 import boto3
-
 from .storage import StorageProvider
 
 logging.basicConfig(level=logging.INFO)
@@ -29,6 +28,10 @@ class S3StorageProvider(StorageProvider):
         super().__init__()
         self.bucket = bucket
         self.s3_client = s3_client
+
+    def get_path(self, uri: str) -> str:
+        parsed = urlparse(uri)
+        return parsed.path.lstrip("/")
 
     def write(self, path: str, data: bytes) -> None:
         """

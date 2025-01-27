@@ -19,6 +19,9 @@ class LocalStorageProvider(StorageProvider):
         """
         super().__init__()
 
+    def get_path(self, uri: str) -> str:
+        return uri
+
     def write(self, path: str, data: bytes) -> None:
         """
         Writes data to the specified path in local storage.

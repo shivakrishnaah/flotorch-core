@@ -34,7 +34,8 @@ class OpenSearchClient(VectorStorage):
         return self.client.bulk(body=body)
 
     def search(self, body):
-        return self.client.search(index=self.index, body=body)
+        response = self.client.search(index=self.index, body=body)
+        return [hit['_source'] for hit in response['hits']['hits']]
     
     def embed_query(self, query_vector: List[float], knn: int):
         vector_field = next((field for field, props in 
