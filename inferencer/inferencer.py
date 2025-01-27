@@ -25,7 +25,7 @@ class BaseInferencer(ABC):
         self.n_shot_prompt_guide_obj = n_shot_prompt_guide_obj
 
     @abstractmethod
-    def generate_text(self, user_query: str, context: List[Dict], default_prompt: str, **kwargs) -> Tuple[Dict[Any, Any], str]:
+    def generate_text(self, user_query: str, context: List[Dict]) -> Tuple[Dict[Any, Any], str]:
         """
         Generate a response based on the user query and context.
 

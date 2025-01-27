@@ -29,7 +29,7 @@ class BedrockInferencer(BaseInferencer):
             region_name=region
         )
 
-    def generate_text(self, user_query: str, context: List[Dict], default_prompt: str, **kwargs) -> Tuple[Dict[Any, Any], str]:
+    def generate_text(self, user_query: str, context: List[Dict]) -> Tuple[Dict[Any, Any], str]:
         """
         Generate a response based on the user query and context using Bedrock.
 
@@ -43,7 +43,7 @@ class BedrockInferencer(BaseInferencer):
             Tuple[Dict[Any, Any], str]: Metadata and the generated response text.
         """
         try:
-            converse_prompt = self.generate_prompt(default_prompt, user_query, context)
+            converse_prompt = self.generate_prompt(user_query, context)
             messages = self._prepare_payload(context, converse_prompt)
             inference_config={"maxTokens": 512, "temperature": self.temperature, "topP": 0.9}
             response = self.client.converse(
@@ -64,7 +64,7 @@ class BedrockInferencer(BaseInferencer):
             logger.error(f"Error generating text with Bedrock: {str(e)}")
             raise
 
-    def generate_prompt(self, default_prompt: str, user_query: str, context: List[Dict]) -> str:
+    def generate_prompt(self, user_query: str, context: List[Dict]) -> str:
         """
         Construct a prompt for the Bedrock inferencer based on the user query and context.
 
@@ -76,7 +76,7 @@ class BedrockInferencer(BaseInferencer):
         Returns:
             str: The constructed prompt.
         """
-        system_prompt = self.n_shot_prompt_guide_obj.get("system_prompt", default_prompt) if self.n_shot_prompt_guide_obj else default_prompt
+        system_prompt = self.n_shot_prompt_guide_obj.get("system_prompt")
 
         context_text = self._format_context(context)
 

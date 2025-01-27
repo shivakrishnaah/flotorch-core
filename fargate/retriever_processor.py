@@ -68,9 +68,9 @@ class RetrieverProcessor(BaseFargateTaskProcessor):
                                            config.get_opensearch_username(), config.get_opensearch_password(),
                                            index_id)
             
-            bedrock_inferencer = BedrockInferencer(exp_config_data.get("retrieval_model"), exp_config_data.get("aws_region"), exp_config_data.get("n_shot_prompts"), exp_config_data.get("temp_retrieval_llm"), exp_config_data.get("n_shot_prompt_guide_obj"))
+            inferencer = BedrockInferencer(exp_config_data.get("aws_region"), exp_config_data.get("n_shot_prompts"), exp_config_data.get("temp_retrieval_llm"), exp_config_data.get("n_shot_prompt_guide_obj"))
 
-            retriever = Retriever(json_reader, embedding, open_search_client, bedrock_inferencer)
+            retriever = Retriever(json_reader, embedding, open_search_client, inferencer)
             retriever.retrieve(gt_data_path, "What is the patient's name?", exp_config_data.get("knn_num"))
             
             output = {"status": "success", "message": "Retriever completed successfully."}

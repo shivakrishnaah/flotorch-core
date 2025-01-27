@@ -29,5 +29,4 @@ class Retriever:
             query = self.vector_storage.embed_query(question_embedding.embeddings, knn)
             context = self.vector_storage.search(query)
 
-            metadata, answer = self.inferencer.generate_text(question.question, context, "You are an intelligent assistant. Answer user questions using only the provided context. Do not make up information, make assumptions or use external knowledge. If the context does not contain the answer, explicitly state that. Do not disclose sensitive information. Maintain a professional tone and ensure responses are accurate and relevant without assumptions.")
-
+            metadata, answer = self.inferencer.generate_text(question.question, context)
