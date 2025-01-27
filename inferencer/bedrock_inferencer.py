@@ -36,8 +36,6 @@ class BedrockInferencer(BaseInferencer):
         Args:
             user_query (str): The question or input from the user.
             context (List[Dict]): Contextual data to assist in generating a response.
-            default_prompt (str): Default prompt to guide the response generation.
-            **kwargs: Additional parameters for customization.
 
         Returns:
             Tuple[Dict[Any, Any], str]: Metadata and the generated response text.
@@ -69,7 +67,6 @@ class BedrockInferencer(BaseInferencer):
         Construct a prompt for the Bedrock inferencer based on the user query and context.
 
         Args:
-            default_prompt (str): Default prompt to guide the response generation.
             user_query (str): The question or input from the user.
             context (List[Dict]): Contextual data to assist in generating a response.
 
