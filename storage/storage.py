@@ -12,6 +12,17 @@ class StorageProvider(ABC):
     """
 
     @abstractmethod
+    def get_path(self, uri: str) -> str:
+        """
+        Gets the path from the URI.
+        Args:
+            uri (str): The URI to get the path from.
+        Returns:
+            str: The path extracted from the URI.
+        """
+        pass
+
+    @abstractmethod
     def write(self, path: str, data: bytes) -> None:
         """
         Writes data to the specified path.

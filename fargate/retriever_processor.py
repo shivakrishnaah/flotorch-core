@@ -8,6 +8,7 @@ from retriever.retriever import Retriever
 from storage.db.vector.open_search import OpenSearchClient
 from embedding.titanv2_embedding import TitanV2Embedding
 from inferencer.bedrock_inferencer import BedrockInferencer
+from storage.storage_provider_factory import StorageProviderFactory
 
 
 logger = get_logger()
@@ -59,16 +60,16 @@ class RetrieverProcessor(BaseFargateTaskProcessor):
             index_id = "local-index-1024"
 
             gt_data = exp_config_data.get("gt_data")
-            gt_data_bucket, gt_data_path = self._get_s3_bucket_and_path(gt_data)
-            s3_storage = S3StorageProvider(gt_data_bucket)
-            json_reader = JSONReader(s3_storage)
+            storage = StorageProviderFactory.create_storage_provider(gt_data)
+            gt_data_path = storage.get_path(gt_data)
+            json_reader = JSONReader(storage)
             embedding = TitanV2Embedding(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"), exp_config_data.get("vector_dimension"))
 
             open_search_client = OpenSearchClient(config.get_opensearch_host(), config.get_opensearch_port(),
                                            config.get_opensearch_username(), config.get_opensearch_password(),
                                            index_id)
             
-            inferencer = BedrockInferencer(exp_config_data.get("aws_region"), exp_config_data.get("n_shot_prompts"), exp_config_data.get("temp_retrieval_llm"), exp_config_data.get("n_shot_prompt_guide_obj"))
+            inferencer = BedrockInferencer(exp_config_data.get("retrieval_model"), exp_config_data.get("aws_region"), exp_config_data.get("n_shot_prompts"), exp_config_data.get("temp_retrieval_llm"), exp_config_data.get("n_shot_prompt_guide_obj"))
 
             retriever = Retriever(json_reader, embedding, open_search_client, inferencer)
             retriever.retrieve(gt_data_path, "What is the patient's name?", exp_config_data.get("knn_num"))
