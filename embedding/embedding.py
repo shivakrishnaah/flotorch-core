@@ -33,7 +33,7 @@ class Embeddings:
 
     def to_json(self) -> Dict:
         {
-            "embedding": self.embedding,
+            "embeddings": self.embeddings,
             "metadata": {
                     "input_tokens": self.metadata.input_tokens,
                     "latency_ms": self.metadata.latency_ms

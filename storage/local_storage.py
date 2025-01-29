@@ -20,7 +20,7 @@ class LocalStorageProvider(StorageProvider):
         super().__init__()
 
     def get_path(self, uri: str) -> str:
-        return uri
+        return uri.split("://")[1]
 
     def write(self, path: str, data: bytes) -> None:
         """

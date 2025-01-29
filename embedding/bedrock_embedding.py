@@ -46,7 +46,3 @@ class BedRockEmbedding(BaseEmbedding):
 
     def extract_embedding(self, response: Dict[str, Any]) -> List[float]:
         return response["embeddings"]
-
-    @abstractmethod
-    def models_supported(self) -> List[str]:
-        pass

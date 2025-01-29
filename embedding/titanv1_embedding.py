@@ -6,6 +6,7 @@ from .embedding_registry import register
 
 
 @register("amazon.titan-embed-text-v1")
+@register("amazon.titan-embed-image-v1")
 class TitanV1Embedding(BedRockEmbedding):
     """
     Initializes the TitanV1Embedding class.

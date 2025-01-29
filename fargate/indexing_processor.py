@@ -10,6 +10,9 @@ from storage.s3_storage import S3StorageProvider
 from indexing.indexing import Index
 from config.config import Config
 from config.env_config_provider import EnvConfigProvider
+from storage.storage_provider_factory import StorageProviderFactory
+from embedding.embedding_registry import embedding_registry
+from chunking.chunking_provider_factory import ChunkingFactory
 
 
 logger = get_logger()
@@ -24,40 +27,51 @@ class IndexingProcessor(BaseFargateTaskProcessor):
     def process(self):
         logger.info("Starting indexing process.")
         try:
-            # exp_config_data = self.input_data.get("experimentConfig", {})
+            exp_config_data = self.input_data.get("experimentConfig", {})
 
-            exp_config_data = {
-                "kb_data": "s3://flotorch-data-paimon/0f5062ad-7dff-4daa-b924-b5a75a88ffa6/kb_data/medical_abstracts_100_169kb.pdf",
-                "chunk_size": 128,
-                "chunk_overlap": 5,
-                "parent_chunk_size": 512,
-                "embedding_model": "amazon.titan-embed-image-v1",
-                "aws_region": "us-east-1"
-            }
+            # exp_config_data = {
+            #     "kb_data": "file://C:/Projects/refactor/medical_abstracts_100_169kb.pdf",
+            #     "chunk_size": 128,
+            #     "chunk_overlap": 5,
+            #     "parent_chunk_size": 512,
+            #     "embedding_model": "amazon.titan-embed-image-v1",
+            #     "aws_region": "us-east-1",
+            #     "chunking_strategy": "Fixed",
+            # }
 
-            index_id = "6w6qd_hi_none_none_b_amazontitanimagev1_256_hnsw"
+            index_id = exp_config_data.get("index_id") # "local-index-1024"
 
             logger.info(f"Experiment config data: {exp_config_data}")
 
             kb_data = exp_config_data.get("kb_data")
-            kb_data_bucket, kb_data_path = self._get_s3_bucket_and_path(kb_data)
-            s3_storage = S3StorageProvider(kb_data_bucket)
-            pdf_reader = PDFReader(s3_storage)
-            chunking = HieraricalChunker(exp_config_data.get("chunk_size"), exp_config_data.get("chunk_overlap"), exp_config_data.get("parent_chunk_size"))
-            embedding = TitanV1Embedding(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"))
+            storage = StorageProviderFactory.create_storage_provider(kb_data)
+            kb_data_path = storage.get_path(kb_data)
+            pdf_reader = PDFReader(storage)
+
+            chunking = ChunkingFactory.create_chunker(
+                exp_config_data.get("chunking_strategy"), 
+                exp_config_data.get("chunk_size"), 
+                exp_config_data.get("chunk_overlap"),
+                exp_config_data.get("parent_chunk_size", None)
+            )
+            
+            embedding_class = embedding_registry.get_model(exp_config_data.get("embedding_model"))
+            embedding = embedding_class(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"))
             indexing = Index(pdf_reader, chunking, embedding)
             embeddings_list = indexing.index(kb_data_path)
-            open_search_client = OpenSearchClient(config.get_opensearch_host(), config.get_opensearch_port(),
-                                           config.get_opensearch_username(), config.get_opensearch_password(),
-                                           index_id)
+
+            open_search_client = OpenSearchClient(
+                config.get_opensearch_host(), 
+                config.get_opensearch_port(),
+                config.get_opensearch_username(), 
+                config.get_opensearch_password(),
+                index_id
+            )
     
             bulk_data = []
             for embedding in embeddings_list.embeddings:
                 # TODO See this index also can be included in the to_dict method
-                bulk_data.append({"index": {"_index": config.get_opensearch_index()}})
-                # below code wont work as Embedding class is not inside the list, embedding array and metadata is extracted earlier from Embeddings class
-                # bulk_data.append(embedding.to_json())
-
+                bulk_data.append({"index": {"_index": index_id}})
                 bulk_data.append(embedding.to_json())
             open_search_client.write_bulk(body=bulk_data)
             output = {"status": "success", "message": "Indexing completed successfully."}
