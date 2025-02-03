@@ -5,6 +5,7 @@ from embedding.titanv1_embedding import TitanV1Embedding
 from fargate.base_task_processor import BaseFargateTaskProcessor
 from logger.global_logger import get_logger
 from reader.pdf_reader import PDFReader
+from storage.db.dynamodb import DynamoDB
 from storage.db.vector import OpenSearchClient
 from storage.s3_storage import S3StorageProvider
 from indexing.indexing import Index
@@ -31,12 +32,14 @@ class IndexingProcessor(BaseFargateTaskProcessor):
 
             # exp_config_data = {
             #     "kb_data": "file://C:/Projects/refactor/medical_abstracts_100_169kb.pdf",
-            #     "chunk_size": 128,
+            #     "chunk_size": 256,
             #     "chunk_overlap": 5,
             #     "parent_chunk_size": 512,
             #     "embedding_model": "amazon.titan-embed-image-v1",
             #     "aws_region": "us-east-1",
             #     "chunking_strategy": "Fixed",
+            #     "experiment_id": "2FE5M010",
+            #     "execution_id": "VCK1X"
             # }
 
             index_id = exp_config_data.get("index_id") # "local-index-1024"
@@ -59,6 +62,15 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             embedding = embedding_class(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"))
             indexing = Index(pdf_reader, chunking, embedding)
             embeddings_list = indexing.index(kb_data_path)
+
+
+            # adding total_index_embed_tokens to dynamo db table: experiment_table
+            experiment_db = DynamoDB(config.get_experiment_table_name(), config.get_region()) 
+            experiment_db.update(
+                key={'id': exp_config_data.get("experiment_id")},
+                data={'index_embed_tokens': embeddings_list.metadata.input_tokens }
+            )
+
 
             open_search_client = OpenSearchClient(
                 config.get_opensearch_host(), 

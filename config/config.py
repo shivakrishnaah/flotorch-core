@@ -88,3 +88,12 @@ class Config:
         if not input_data:
             raise ValueError("input data is not set. Value not present in configuration")
         return input_data
+    
+    def get_experiment_table_name(self) -> str:
+        """
+        Retrieves the experiment table name from the configuration provider.
+        """
+        experiment_table_name = self.provider.get("experiment_table")
+        if not experiment_table_name:
+            raise ValueError("experiment table name is not set. Value not present in configuration")
+        return experiment_table_name
