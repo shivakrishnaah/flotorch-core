@@ -15,6 +15,8 @@ from storage.storage_provider_factory import StorageProviderFactory
 from embedding.embedding_registry import embedding_registry
 from chunking.chunking_provider_factory import ChunkingFactory
 
+from temp.bge_large_embedding import BGELargeEmbedding, BGEM3Embedding, GTEQwen2Embedding
+
 
 logger = get_logger()
 env_config_provider = EnvConfigProvider()
@@ -35,11 +37,13 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             #     "chunk_size": 256,
             #     "chunk_overlap": 5,
             #     "parent_chunk_size": 512,
-            #     "embedding_model": "amazon.titan-embed-image-v1",
+            #     "embedding_model": "huggingface-sentencesimilarity-bge-large-en-v1-5",
             #     "aws_region": "us-east-1",
             #     "chunking_strategy": "Fixed",
-            #     "experiment_id": "2FE5M010",
-            #     "execution_id": "VCK1X"
+            #     "experiment_id": "CK016M3Z",
+            #     "execution_id": "S2ROS",
+            #     "vector_dimension": 1024,
+            #     "embedding_service": "sagemaker",    # sagemaker/bedrock
             # }
 
             index_id = exp_config_data.get("index_id") # "local-index-1024"
@@ -57,9 +61,11 @@ class IndexingProcessor(BaseFargateTaskProcessor):
                 exp_config_data.get("chunk_overlap"),
                 exp_config_data.get("parent_chunk_size", None)
             )
-            
+
             embedding_class = embedding_registry.get_model(exp_config_data.get("embedding_model"))
-            embedding = embedding_class(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"))
+            embedding = embedding_class(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"), exp_config_data.get("vector_dimension"))
+
+
             indexing = Index(pdf_reader, chunking, embedding)
             embeddings_list = indexing.index(kb_data_path)
 
