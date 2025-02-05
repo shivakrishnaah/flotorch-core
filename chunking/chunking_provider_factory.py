@@ -7,9 +7,9 @@ class ChunkingFactory:
     """
     @staticmethod
     def create_chunker(chunking_strategy: str, chunk_size: int, chunk_overlap: int, parent_chunk_size: int = None):
-        if chunking_strategy == "Hierarchical":
+        if chunking_strategy.lower() == "hierarchical":
             return HieraricalChunker(chunk_size, chunk_overlap, parent_chunk_size)
-        elif chunking_strategy == "Fixed":
+        elif chunking_strategy.lower() == "fixed":
             return FixedSizeChunker(chunk_size, chunk_overlap)
         else:
             raise ValueError(f"Unsupported chunking type: {chunking_strategy}")
