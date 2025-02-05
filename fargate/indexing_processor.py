@@ -48,10 +48,10 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             # }
 
 
-            logger.info("Into indexing processor. Processing event: %s", json.dumps(exp_config_data))
+            logger.info(f"Into indexing processor. Processing event: {json.dumps(exp_config_data)}")
 
             index_id = exp_config_data.get("index_id") # "local-index-1024"
-            
+
             kb_data = exp_config_data.get("kb_data")
             storage = StorageProviderFactory.create_storage_provider(kb_data)
             kb_data_path = storage.get_path(kb_data)
