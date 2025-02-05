@@ -1,3 +1,4 @@
+import json
 from chunking.fixedsize_chunking import FixedSizeChunker
 from chunking.hierarical_chunking import HieraricalChunker
 from embedding.titanv2_embedding import TitanV2Embedding
@@ -30,7 +31,7 @@ class IndexingProcessor(BaseFargateTaskProcessor):
     def process(self):
         logger.info("Starting indexing process.")
         try:
-            exp_config_data = self.input_data.get("experimentConfig", {})
+            exp_config_data = self.input_data
 
             # exp_config_data = {
             #     "kb_data": "file://C:/Projects/refactor/medical_abstracts_100_169kb.pdf",
@@ -46,10 +47,11 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             #     "embedding_service": "sagemaker",    # sagemaker/bedrock
             # }
 
+
+            logger.info("Into indexing processor. Processing event: %s", json.dumps(exp_config_data))
+
             index_id = exp_config_data.get("index_id") # "local-index-1024"
-
-            logger.info(f"Experiment config data: {exp_config_data}")
-
+            
             kb_data = exp_config_data.get("kb_data")
             storage = StorageProviderFactory.create_storage_provider(kb_data)
             kb_data_path = storage.get_path(kb_data)
