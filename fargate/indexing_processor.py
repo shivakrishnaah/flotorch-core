@@ -15,7 +15,7 @@ from storage.storage_provider_factory import StorageProviderFactory
 from embedding.embedding_registry import embedding_registry
 from chunking.chunking_provider_factory import ChunkingFactory
 
-from temp.bge_large_embedding import BGELargeEmbedding, BGEM3Embedding, GTEQwen2Embedding
+from embedding.bge_large_embedding import BGELargeEmbedding, BGEM3Embedding, GTEQwen2Embedding
 
 
 logger = get_logger()

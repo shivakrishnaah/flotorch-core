@@ -2,7 +2,7 @@ from typing import List, Dict
 from chunking.chunking import Chunk
 from config.config import Config
 from config.env_config_provider import EnvConfigProvider
-from temp.sagemaker_embedding import SageMakerEmbedder
+from embedding.sagemaker_embedding import SageMakerEmbedder
 from embedding.embedding_registry import register
 
 env_config_provider = EnvConfigProvider()
