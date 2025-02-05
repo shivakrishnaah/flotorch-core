@@ -532,7 +532,7 @@ class SageMakerEmbedder(BaseEmbedding):
                     logger.error("Response content (raw): %s", response)
             raise
     
-    def _sanitize_name(name: str) -> str:
+    def _sanitize_name(self, name: str) -> str:
         """Sanitize the endpoint name to follow AWS naming conventions"""
         # Replace any character that's not alphanumeric or hyphen with hyphen
         import re

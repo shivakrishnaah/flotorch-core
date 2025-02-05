@@ -59,9 +59,9 @@ class IndexingProcessor(BaseFargateTaskProcessor):
 
             chunking = ChunkingFactory.create_chunker(
                 exp_config_data.get("chunking_strategy"), 
-                exp_config_data.get("chunk_size"), 
-                exp_config_data.get("chunk_overlap"),
-                exp_config_data.get("parent_chunk_size", None)
+                int(exp_config_data.get("chunk_size")), 
+                int(exp_config_data.get("chunk_overlap")),
+                int(exp_config_data.get("parent_chunk_size")) if "parent_chunk_size" in exp_config_data else None
             )
 
             embedding_class = embedding_registry.get_model(exp_config_data.get("embedding_model"))
@@ -70,6 +70,8 @@ class IndexingProcessor(BaseFargateTaskProcessor):
 
             indexing = Index(pdf_reader, chunking, embedding)
             embeddings_list = indexing.index(kb_data_path)
+
+            logger.info("Indexing completed")
 
 
             # adding total_index_embed_tokens to dynamo db table: experiment_table
