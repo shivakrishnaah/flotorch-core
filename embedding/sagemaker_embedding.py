@@ -144,7 +144,7 @@ class SageMakerEmbedder(BaseEmbedding):
                 return False
 
             # Create SageMaker session
-            boto_session = boto3.Session(region_name=self.region_name)
+            boto_session = boto3.Session(region_name=self.region)
             sagemaker_session = sagemaker.Session(boto_session=boto_session)
 
             # Initialize JumpStart model
@@ -345,7 +345,7 @@ class SageMakerEmbedder(BaseEmbedding):
             raise ValueError(f"Unsupported model ID: {model_id}")
 
         # Create AWS and SageMaker sessions for API interactions
-        boto_session = boto3.Session(region_name=self.region_name)
+        boto_session = boto3.Session(region_name=self.region)
         sagemaker_session = sagemaker.Session(boto_session=boto_session)
 
         # Look up the appropriate instance type from model configurations
@@ -393,7 +393,7 @@ class SageMakerEmbedder(BaseEmbedding):
                             'SM_NUM_GPUS': json.dumps(1)
                         }
                         huggingface_model = HuggingFaceModel(
-                            image_uri=get_huggingface_llm_image_uri("huggingface", version="2.3.1", region=self.region_name),
+                            image_uri=get_huggingface_llm_image_uri("huggingface", version="2.3.1", region=self.region),
                             env=hub,
                             role=self.role, 
                         )
