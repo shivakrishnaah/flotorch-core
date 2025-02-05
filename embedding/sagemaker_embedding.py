@@ -127,7 +127,7 @@ class SageMakerEmbedder(BaseEmbedding):
     def create_jumpstart_endpoint(self, model_id: str, endpoint_name: str) -> bool:
         """
         Creates a SageMaker endpoint for JumpStart models.
-        If the endpoint configuration already exists, it will be reused.
+        Reuses existing model and endpoint configuration if available.
 
         Args:
             model_id (str): The model ID for the SageMaker JumpStart model.
@@ -137,13 +137,11 @@ class SageMakerEmbedder(BaseEmbedding):
             bool: True if the endpoint is successfully created, False otherwise.
         """
         try:
-            # Get model configuration
             model_config = EMBEDDING_MODELS.get(model_id)
             if not model_config or model_config.get("model_source") != "jumpstart":
                 logger.error(f"Model ID '{model_id}' is not a valid JumpStart model.")
                 return False
 
-            # Create SageMaker session
             boto_session = boto3.Session(region_name=self.region)
             sagemaker_session = sagemaker.Session(boto_session=boto_session)
 
@@ -156,24 +154,31 @@ class SageMakerEmbedder(BaseEmbedding):
 
             # Check if the endpoint configuration exists
             try:
-                response = self.sagemaker_client.describe_endpoint_config(
+                self.sagemaker_client.describe_endpoint_config(
                     EndpointConfigName=endpoint_name
                 )
-                logger.info(f"Endpoint configuration '{endpoint_name}' already exists. Reusing it.")
-            except self.sagemaker_client.exceptions.ResourceNotFound:
-                logger.info(f"Endpoint configuration '{endpoint_name}' does not exist. Creating a new one.")
-                model.create_endpoint_config(
-                    initial_instance_count=1,
-                    instance_type=model_config["instance_type"],
-                    endpoint_name=endpoint_name,
-                    accept_eula=True
-                )
+                logger.info(f"Endpoint configuration '{endpoint_name}' exists. Deploying endpoint.")
 
-            # Deploy the model to SageMaker using the existing or newly created configuration
-            predictor = self.sagemaker_client.create_endpoint(
-                EndpointName=endpoint_name,
-                EndpointConfigName=endpoint_name
-            )
+                # Deploy the endpoint using the existing configuration
+                self.sagemaker_client.create_endpoint(
+                    EndpointName=endpoint_name,
+                    EndpointConfigName=endpoint_name
+                )
+            except self.sagemaker_client.exceptions.ClientError as e:
+                error_code = e.response['Error']['Code']
+                if error_code == 'ValidationException' and 'Could not find endpoint configuration' in e.response['Error']['Message']:
+                    logger.info(f"Endpoint configuration '{endpoint_name}' does not exist. Deploying using model.deploy().")
+
+                    # Use model.deploy to handle everything
+                    model.deploy(
+                        initial_instance_count=1,
+                        instance_type=model_config["instance_type"],
+                        endpoint_name=endpoint_name,
+                        accept_eula=True
+                    )
+                else:
+                    logger.error(f"Error while checking endpoint configuration: {e}")
+                    raise
 
             logger.info(f"Successfully created endpoint '{endpoint_name}' for model '{model_id}'.")
             return True
