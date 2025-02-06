@@ -63,7 +63,7 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             )
 
             embedding_class = embedding_registry.get_model(exp_config_data.get("embedding_model"))
-            embedding = embedding_class(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"), exp_config_data.get("vector_dimension"))
+            embedding = embedding_class(exp_config_data.get("embedding_model"), exp_config_data.get("aws_region"), int(exp_config_data.get("vector_dimension")))
 
 
             indexing = Index(pdf_reader, chunking, embedding)
