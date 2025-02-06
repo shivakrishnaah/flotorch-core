@@ -1,14 +1,13 @@
 import json
-from chunking.fixedsize_chunking import FixedSizeChunker
-from chunking.hierarical_chunking import HieraricalChunker
 from embedding.titanv2_embedding import TitanV2Embedding
 from embedding.titanv1_embedding import TitanV1Embedding
+from embedding.cohere_embedding import CohereEmbedding
+from embedding.bge_large_embedding import BGELargeEmbedding, BGEM3Embedding, GTEQwen2Embedding
 from fargate.base_task_processor import BaseFargateTaskProcessor
 from logger.global_logger import get_logger
 from reader.pdf_reader import PDFReader
 from storage.db.dynamodb import DynamoDB
 from storage.db.vector import OpenSearchClient
-from storage.s3_storage import S3StorageProvider
 from indexing.indexing import Index
 from config.config import Config
 from config.env_config_provider import EnvConfigProvider
@@ -16,7 +15,6 @@ from storage.storage_provider_factory import StorageProviderFactory
 from embedding.embedding_registry import embedding_registry
 from chunking.chunking_provider_factory import ChunkingFactory
 
-from embedding.bge_large_embedding import BGELargeEmbedding, BGEM3Embedding, GTEQwen2Embedding
 
 
 logger = get_logger()
