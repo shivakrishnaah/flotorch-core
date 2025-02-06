@@ -1,6 +1,7 @@
 import boto3
-from storage.db import DBStorage
+from storage.db.db_storage import DBStorage
 from botocore.exceptions import ClientError
+from typing import List, Dict, Any
 
 class DynamoDB(DBStorage):
     def __init__(self, table_name, region_name='us-east-1'):
@@ -29,4 +30,26 @@ class DynamoDB(DBStorage):
             for item in items:
                 batch.put_item(Item=item)
         return True
+    
+    def update(self, key: Dict[str, Any], data: Dict[str, Any]) -> bool:
+        """
+        Update method accepts:
+        - `key`: Unique identifier to find the record (e.g., {'id': 123})
+        - `data`: Fields to be updated with new values (e.g., {'status': 'completed'})
+        """
+        try:
+            # Dynamically construct UpdateExpression and ExpressionAttributeValues
+            update_expression = "SET " + ", ".join(f"{k} = :{k}" for k in data.keys())
+            expression_values = {f":{k}": v for k, v in data.items()}
+
+            self.table.update_item(
+                Key=key,
+                UpdateExpression=update_expression,
+                ExpressionAttributeValues=expression_values,
+                ReturnValues="UPDATED_NEW"
+            )
+            return True
+        except ClientError as e:
+            print(f"Error updating DynamoDB: {e}")
+            return False
     

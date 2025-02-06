@@ -56,23 +56,52 @@ class S3StorageProvider(StorageProvider):
             Generator[bytes, None, None]: A generator that yields the data read from the S3 bucket.
         """
         logger.info('Reading data from S3 storage')
-        if os.path.isdir(path):
+        if self._is_directory(path):
             yield from self._read_directory(path)
         else:
             response = self.s3_client.get_object(Bucket=self.bucket, Key=path)
             yield response['Body'].read()
 
-    def _read_directory(self, path: str):
+    def _is_directory(self, path: str) -> bool:
         """
-        Reads all files in the specified directory in the S3 bucket.
-        Args:
-            path (str): The path to the directory in the S3 bucket.
-        Returns:
-            Generator[bytes, None, None]: A generator that yields the data read from the S3 bucket.
-        """
+        Determines if the given S3 path is a directory by checking if multiple files exist under the prefix.
 
-        for filename in os.listdir(path):
-            file_path = os.path.join(path, filename)
-            if os.path.isfile(file_path):
-                response = self.s3_client.get_object(Bucket=self.bucket, Key=file_path)
-                yield response['Body'].read()
+        Args:
+            path (str): The S3 path.
+
+        Returns:
+            bool: True if the path is a directory, False otherwise.
+        """
+        if not path.endswith("/"):  # Ensure the path ends with a slash to treat it as a directory
+            path += "/"
+
+        response = self.s3_client.list_objects_v2(Bucket=self.bucket, Prefix=path, MaxKeys=1)
+        return "Contents" in response  # If "Contents" exists, it's a directory
+
+    def _read_directory(self, path: str) -> Generator[bytes, None, None]:
+        """
+        Reads all files in the specified S3 directory.
+
+        Args:
+            path (str): The S3 directory path.
+
+        Returns:
+            Generator[bytes, None, None]: Yields file contents.
+        """
+        if not path.endswith("/"):
+            path += "/"
+
+        response = self.s3_client.list_objects_v2(Bucket=self.bucket, Prefix=path)
+
+        if "Contents" not in response:
+            logger.warning(f"No files found in S3 directory: {path}")
+            return
+
+        for obj in response["Contents"]:
+            file_key = obj["Key"]
+            if file_key.endswith("/"):  # Skip directories
+                continue
+
+            logger.info(f"Reading S3 file: {file_key}")
+            file_response = self.s3_client.get_object(Bucket=self.bucket, Key=file_key)
+            yield file_response['Body'].read()

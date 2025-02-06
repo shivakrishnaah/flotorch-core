@@ -88,3 +88,21 @@ class Config:
         if not input_data:
             raise ValueError("input data is not set. Value not present in configuration")
         return input_data
+    
+    def get_experiment_table_name(self) -> str:
+        """
+        Retrieves the experiment table name from the configuration provider.
+        """
+        experiment_table_name = self.provider.get("experiment_table")
+        if not experiment_table_name:
+            raise ValueError("experiment table name is not set. Value not present in configuration")
+        return experiment_table_name
+    
+    def get_sagemaker_arn_role(self) -> str:
+        """
+        Retrieves the SageMaker ARN role from the configuration provider.
+        """
+        sagemaker_arn_role = self.provider.get("sagemaker_role_arn")
+        if not sagemaker_arn_role:
+            raise ValueError("sagemaker arn role is not set. Value not present in configuration")
+        return sagemaker_arn_role

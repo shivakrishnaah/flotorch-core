@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Dict, Any
 
 """
 This class is responsible for storing the data in the database.
