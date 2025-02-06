@@ -32,6 +32,11 @@ class DynamoDB(DBStorage):
         return True
     
     def update(self, key: Dict[str, Any], data: Dict[str, Any]) -> bool:
+        """
+        Update method accepts:
+        - `key`: Unique identifier to find the record (e.g., {'id': 123})
+        - `data`: Fields to be updated with new values (e.g., {'status': 'completed'})
+        """
         try:
             # Dynamically construct UpdateExpression and ExpressionAttributeValues
             update_expression = "SET " + ", ".join(f"{k} = :{k}" for k in data.keys())
