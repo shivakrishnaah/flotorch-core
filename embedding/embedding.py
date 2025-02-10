@@ -34,11 +34,11 @@ class Embeddings:
 
     def to_json(self) -> Dict:
         return {
-            "embeddings": self.embeddings,
+            "vectors": self.embeddings,
             "text": self.text,
             "metadata": {
-                    "input_tokens": self.metadata.input_tokens,
-                    "latency_ms": self.metadata.latency_ms
+                    "inputTokens": self.metadata.input_tokens,
+                    "latencyMs": self.metadata.latency_ms
                 }
         }
 
