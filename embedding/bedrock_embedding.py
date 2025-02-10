@@ -4,6 +4,7 @@ from abc import abstractmethod
 import boto3
 
 from chunking.chunking import Chunk
+from utils.bedrock_retry_handler import BedRockRetryHander
 from .embedding import BaseEmbedding, Embeddings, EmbeddingMetadata
 
 
@@ -13,6 +14,7 @@ class BedRockEmbedding(BaseEmbedding):
         self._application_json = "application/json"
         self.client = boto3.client("bedrock-runtime", region_name=self.region)
 
+    @BedRockRetryHander()
     def embed(self, chunk: Chunk) -> Embeddings:
         payload = self._prepare_chunk(chunk)
         response = self._invoke_model(payload)
