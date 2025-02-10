@@ -521,7 +521,7 @@ class SageMakerEmbedder(BaseEmbedding):
             latency = int((time.time() - start_time) * 1000)
             metadata = self._extract_metadata(chunk, latency)
             model_response = self._parse_model_response(response)
-            return Embeddings(embeddings=model_response, metadata=metadata)
+            return Embeddings(embeddings=model_response, metadata=metadata, text=chunk.data)
         except Exception as e:
             # Log detailed error information for debugging
             logger.error("Error in get_embedding: %s", str(e))

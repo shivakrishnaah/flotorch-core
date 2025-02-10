@@ -27,13 +27,15 @@ class Embeddings:
     :param embeddings: The embeddings.
     :param metadata: The metadata.
     """
-    def __init__(self, embeddings: List[List[float]], metadata: EmbeddingMetadata):
+    def __init__(self, embeddings: List[List[float]], metadata: EmbeddingMetadata, text: str):
         self.embeddings = embeddings
         self.metadata = metadata
+        self.text = text
 
     def to_json(self) -> Dict:
         return {
             "embeddings": self.embeddings,
+            "text": self.text,
             "metadata": {
                     "input_tokens": self.metadata.input_tokens,
                     "latency_ms": self.metadata.latency_ms
