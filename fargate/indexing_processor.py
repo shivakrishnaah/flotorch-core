@@ -79,6 +79,7 @@ class IndexingProcessor(BaseFargateTaskProcessor):
                 data={'index_embed_tokens': embeddings_list.metadata.input_tokens }
             )
 
+            logger.info("DB update completed")
 
             open_search_client = OpenSearchClient(
                 config.get_opensearch_host(), 
@@ -92,8 +93,12 @@ class IndexingProcessor(BaseFargateTaskProcessor):
             for embedding in embeddings_list.embeddings:
                 # TODO See this index also can be included in the to_dict method
                 bulk_data.append({"index": {"_index": index_id}})
-                bulk_data.append(embedding.to_json())
+                data = embedding.to_json()
+                data["_index"] = index_id
+                # bulk_data.append(embedding.to_json())
+                bulk_data.append(data)
             open_search_client.write_bulk(body=bulk_data)
+            logger.info("opensearch bulk write completed")
             output = {"status": "success", "message": "Indexing completed successfully."}
             self.send_task_success(output)
         except Exception as e:
