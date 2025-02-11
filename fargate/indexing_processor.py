@@ -59,7 +59,7 @@ class IndexingProcessor(BaseFargateTaskProcessor):
                 exp_config_data.get("chunking_strategy"), 
                 int(exp_config_data.get("chunk_size", exp_config_data.get("hierarchical_child_chunk_size"))), 
                 int(exp_config_data.get("chunk_overlap", exp_config_data.get("hierarchical_chunk_overlap_percentage"))),
-                int(exp_config_data.get("hierarchical_parent_chunk_size"), 0)
+                int(exp_config_data.get("hierarchical_parent_chunk_size", 0))
             )
 
             embedding_class = embedding_registry.get_model(exp_config_data.get("embedding_model"))
