@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from chunking.chunking import Chunk
 from .bedrock_embedding import BedRockEmbedding
@@ -29,3 +29,7 @@ class CohereEmbedding(BedRockEmbedding):
     
     def _prepare_chunk(self, chunk: Chunk) -> Dict:
         return {"texts": [chunk.data], "input_type": "search_document"}
+    
+    def extract_embedding(self, response: Dict[str, Any]) -> List[float]:
+        return response["embeddings"][0]
+
