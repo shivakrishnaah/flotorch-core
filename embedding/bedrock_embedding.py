@@ -21,7 +21,7 @@ class BedRockEmbedding(BaseEmbedding):
         metadata = self._extract_metadata(response)
         model_response = self._parse_model_response(response)
         return Embeddings(embeddings=self.extract_embedding(model_response),
-                          metadata=metadata)
+                          metadata=metadata, text=chunk.data)
 
     def _invoke_model(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         return self.client.invoke_model(
