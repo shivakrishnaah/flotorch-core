@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "FloTorch"
+name = "FloTorch-core"
 version = "2.0.0"
 description = "A Python project for FloTorch"
 authors = [
@@ -28,9 +28,6 @@ dev = [
     ]
 
 [tool.setuptools]
-# Slowly move the whole code to src so that on the higher level it looks clean
-# src = source code 
-# tests = Test code
 packages = { find = {} }  # Automatically finds all packages in your source.
 
 [tool.flake8]

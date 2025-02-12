@@ -28,5 +28,4 @@ class Retriever:
             question_embedding = self.embedding.embed(question_chunk)
             query = self.vector_storage.embed_query(question_embedding.embeddings, knn)
             context = self.vector_storage.search(query)
-
             metadata, answer = self.inferencer.generate_text(question.question, context)
