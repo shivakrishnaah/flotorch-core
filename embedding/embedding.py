@@ -32,6 +32,7 @@ class Embeddings:
         self.embeddings = embeddings
         self.metadata = metadata
         self.text = text
+        self.id = ''
 
     def clean_text_for_vector_db(self, text):
         """
@@ -118,6 +119,14 @@ class BaseEmbedding(ABC):
         if not isinstance(chunks, list):
             return embedding_list.append(self.embed(chunks))
         for chunk in chunks:
-            embedding = self.embed(chunk)
-            embedding_list.append(embedding)
+            if chunk.child_data:
+                for child_chunk in chunk.child_data:
+                    embedding = self.embed(child_chunk)
+                    embedding.id = chunk.id
+                    embedding.text = chunk.data
+                    embedding_list.append(embedding)
+            else:
+                embedding = self.embed(chunk)
+                embedding.id = chunk.id
+                embedding_list.append(embedding)
         return embedding_list
