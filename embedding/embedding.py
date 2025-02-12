@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import re
 from typing import List, Dict
 
 from chunking.chunking import Chunk
@@ -32,10 +33,32 @@ class Embeddings:
         self.metadata = metadata
         self.text = text
 
+    def clean_text_for_vector_db(self, text):
+        """
+        Cleans the input text by removing quotes, special symbols, extra whitespaces,
+        newline (\n), and tab (\t) characters.
+
+        Args:
+            text (str): The input text to clean.
+
+        Returns:
+            str: The cleaned text.
+        """
+        # Remove single and double quotes
+        text = text.replace('"', '').replace("'", "")
+        # Remove special symbols (keeping alphanumerics and spaces)
+        text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
+        # Remove newlines and tabs
+        text = text.replace('\n', ' ').replace('\t', ' ')
+        # Normalize whitespace
+        text = re.sub(r'\s+', ' ', text)
+        # Strip leading and trailing spaces
+        return text.strip()
+
     def to_json(self) -> Dict:
         return {
             "vectors": self.embeddings,
-            "text": self.text,
+            "text": self.clean_text_for_vector_db(self.text),
             "metadata": {
                     "inputTokens": self.metadata.input_tokens,
                     "latencyMs": self.metadata.latency_ms
