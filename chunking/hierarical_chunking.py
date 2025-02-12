@@ -40,6 +40,8 @@ class HieraricalChunker(FixedSizeChunker):
             chunk_object = Chunk(parent_chunk)
             child_chunks = self.child_text_splitter.split_text(parent_chunk)
             for child_chunk in child_chunks:
-                chunk_object.add_child(child_chunk)
-                overall_chunks.append(chunk_object)
+                child_chunk_object = Chunk(child_chunk)
+                chunk_object.add_child(child_chunk_object)
+
+            overall_chunks.append(chunk_object)
         return overall_chunks
