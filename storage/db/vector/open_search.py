@@ -1,19 +1,22 @@
 import os
 from opensearchpy import OpenSearch
+from embedding.embedding import BaseEmbedding
 from storage.db.vector.vector_storage import VectorStorage
-from typing import List
+from typing import List, Optional
 
 """
 This class is responsible for storing the data in the OpenSearch.
 """
 
 class OpenSearchClient(VectorStorage):
-    def __init__(self, host, port, username, password, index, use_ssl=True, verify_certs=True, ssl_assert_hostname=False, ssl_show_warn=False):
+    def __init__(self, host, port, username, password, index, use_ssl=True, verify_certs=True, ssl_assert_hostname=False, ssl_show_warn=False,
+                 embedder: Optional[BaseEmbedding] = None):
         self.host = host
         self.port = port
         self.username = username
         self.password = password
         self.index = index
+        self.embedder = embedder
         
         self.client = OpenSearch(
             hosts=[{'host': self.host, 'port': self.port}],
@@ -33,15 +36,17 @@ class OpenSearchClient(VectorStorage):
     def write_bulk(self, body: List[dict]):
         return self.client.bulk(body=body)
 
-    def search(self, body):
+    def search(self, query: str,  knn: int, hierarchical=False):
+        query_vector = self.embedder.embed(query).embeddings
+        body = self.embed_query(query_vector, knn, hierarchical)
         response = self.client.search(index=self.index, body=body)
         return [hit['_source'] for hit in response['hits']['hits']]
     
-    def embed_query(self, query_vector: List[float], knn: int):
+    def embed_query(self, query_vector: List[float], knn: int, hierarchical=False):
         vector_field = next((field for field, props in 
                             self.client.indices.get_mapping(index=self.index)[self.index]['mappings']['properties'].items() 
                             if 'type' in props and props['type'] == 'knn_vector'), None)
-        return {
+        query =  {
             "size": knn,
             "query": {
                 "knn": {
@@ -51,6 +56,9 @@ class OpenSearchClient(VectorStorage):
                     }
                 }
             },
+            "collapse": {"field": "parent_id"},  # Collapse the results by parent_id
             "_source": True,
             "fields": ["text", "parent_id"]
         }
+        if hierarchical:
+            query["collapse"] = {"field": "parent_id"}
