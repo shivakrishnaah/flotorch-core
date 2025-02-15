@@ -36,6 +36,8 @@ class OpenSearchClient(VectorStorage):
     def write_bulk(self, body: List[dict]):
         return self.client.bulk(body=body)
 
+    # TODO: Need to create a model class for the return type of the search method
+    # This model class has to be created in the base class and this return type has to be consitent in all the vector_sotrage classes
     def search(self, query: str,  knn: int, hierarchical=False):
         query_vector = self.embedder.embed(query).embeddings
         body = self.embed_query(query_vector, knn, hierarchical)
