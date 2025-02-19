@@ -1,7 +1,8 @@
 import os
 from opensearchpy import OpenSearch
+from chunking.chunking import Chunk
 from embedding.embedding import BaseEmbedding
-from storage.db.vector.vector_storage import VectorStorage
+from storage.db.vector.vector_storage import VectorStorage, VectorStorageSearchItem, VectorStorageSearchResponse
 from typing import List, Optional
 
 """
@@ -9,7 +10,7 @@ This class is responsible for storing the data in the OpenSearch.
 """
 
 class OpenSearchClient(VectorStorage):
-    def __init__(self, host, port, username, password, index, use_ssl=True, verify_certs=True, ssl_assert_hostname=False, ssl_show_warn=False,
+    def __init__(self, host, port, username, password, index, use_ssl=True, verify_certs=False, ssl_assert_hostname=False, ssl_show_warn=False,
                  embedder: Optional[BaseEmbedding] = None):
         self.host = host
         self.port = port
@@ -38,11 +39,28 @@ class OpenSearchClient(VectorStorage):
 
     # TODO: Need to create a model class for the return type of the search method
     # This model class has to be created in the base class and this return type has to be consitent in all the vector_sotrage classes
-    def search(self, query: str,  knn: int, hierarchical=False):
-        query_vector = self.embedder.embed(query).embeddings
+    def search(self, chunk: Chunk,  knn: int, hierarchical=False):
+        query_vector = self.embedder.embed(chunk).embeddings
         body = self.embed_query(query_vector, knn, hierarchical)
         response = self.client.search(index=self.index, body=body)
-        return [hit['_source'] for hit in response['hits']['hits']]
+
+        result = []
+        for hit in response['hits']['hits']:
+            source = hit['_source']
+            result.append(
+                VectorStorageSearchItem(
+                    execution_id=hit['_id'],
+                    chunk_id=source['chunk_id'],
+                    text=source['text'],
+                    vectors=source['vectors'],
+                    metadata=source['metadata']
+                )
+            )
+
+        return VectorStorageSearchResponse(
+            status=True,
+            result=result
+        )
     
     def embed_query(self, query_vector: List[float], knn: int, hierarchical=False):
         vector_field = next((field for field, props in 
@@ -58,9 +76,11 @@ class OpenSearchClient(VectorStorage):
                     }
                 }
             },
-            "collapse": {"field": "parent_id"},  # Collapse the results by parent_id
+            # "collapse": {"field": "parent_id"},  # Collapse the results by parent_id
             "_source": True,
             "fields": ["text", "parent_id"]
         }
         if hierarchical:
             query["collapse"] = {"field": "parent_id"}
+
+        return query
