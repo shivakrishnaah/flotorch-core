@@ -8,7 +8,7 @@ class BaseGuardRail(ABC):
         self.response = response
         
     @abstractmethod
-    def apply_guardrail(self, content: str,
+    def apply_guardrail(self, text: str,
         source: str = 'INPUT'):
         pass
 
@@ -25,10 +25,10 @@ class BedrockGuardrail(BaseGuardRail):
                 'guardrailIdentifier': self.guardrail_id,
                 'guardrailVersion': self.guardrail_version,
                 'source': source,
-                'content': [{"text": text}]
+                'content': [{"text": {"text": text}}]
             }
             response = self.runtime_client.apply_guardrail(**request_params)
             return response
-        except ClientError as e:
+        except Exception as e:
             print(f"Error applying guardrail: {str(e)}")
             raise
