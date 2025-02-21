@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import re
 from typing import List, Dict
 
 from chunking.chunking import Chunk
@@ -27,16 +28,41 @@ class Embeddings:
     :param embeddings: The embeddings.
     :param metadata: The metadata.
     """
-    def __init__(self, embeddings: List[List[float]], metadata: EmbeddingMetadata):
+    def __init__(self, embeddings: List[List[float]], metadata: EmbeddingMetadata, text: str):
         self.embeddings = embeddings
         self.metadata = metadata
+        self.text = text
+        self.id = ''
+
+    def clean_text_for_vector_db(self, text):
+        """
+        Cleans the input text by removing quotes, special symbols, extra whitespaces,
+        newline (\n), and tab (\t) characters.
+
+        Args:
+            text (str): The input text to clean.
+
+        Returns:
+            str: The cleaned text.
+        """
+        # Remove single and double quotes
+        text = text.replace('"', '').replace("'", "")
+        # Remove special symbols (keeping alphanumerics and spaces)
+        text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
+        # Remove newlines and tabs
+        text = text.replace('\n', ' ').replace('\t', ' ')
+        # Normalize whitespace
+        text = re.sub(r'\s+', ' ', text)
+        # Strip leading and trailing spaces
+        return text.strip()
 
     def to_json(self) -> Dict:
-        {
-            "embeddings": self.embeddings,
+        return {
+            "vectors": self.embeddings,
+            "text": self.clean_text_for_vector_db(self.text),
             "metadata": {
-                    "input_tokens": self.metadata.input_tokens,
-                    "latency_ms": self.metadata.latency_ms
+                    "inputTokens": self.metadata.input_tokens,
+                    "latencyMs": self.metadata.latency_ms
                 }
         }
 
@@ -93,6 +119,14 @@ class BaseEmbedding(ABC):
         if not isinstance(chunks, list):
             return embedding_list.append(self.embed(chunks))
         for chunk in chunks:
-            embedding = self.embed(chunk)
-            embedding_list.append(embedding)
+            if chunk.child_data:
+                for child_chunk in chunk.child_data:
+                    embedding = self.embed(child_chunk)
+                    embedding.id = chunk.id
+                    embedding.text = chunk.data
+                    embedding_list.append(embedding)
+            else:
+                embedding = self.embed(chunk)
+                embedding.id = chunk.id
+                embedding_list.append(embedding)
         return embedding_list

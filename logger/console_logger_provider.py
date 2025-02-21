@@ -9,10 +9,12 @@ class ConsoleLoggerProvider(LoggerProvider):
     def __init__(self, name: str = "default"):
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.INFO)
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
+
+        if not self.logger.handlers:  
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
 
     def log(self, level: str, message: str) -> None:
         log_method = getattr(self.logger, level.lower(), self.logger.info)
