@@ -50,7 +50,8 @@ class OpenSearchClient(VectorStorage):
             result.append(
                 VectorStorageSearchItem(
                     execution_id=hit['_id'],
-                    chunk_id=source['chunk_id'],
+                    chunk_id=source['chunk_id'] if 'chunk_id' in source else None,
+                    parent_id=source['parent_id'] if 'parent_id' in source else None,
                     text=source['text'],
                     vectors=source['vectors'],
                     metadata=source['metadata']
