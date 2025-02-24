@@ -10,22 +10,31 @@ class VectorStorageSearchItem:
     text: str
     execution_id: str = field(default_factory=None)
     chunk_id: str = field(default_factory=None)
+    parent_id: str = field(default_factory=None)
     vectors: List[float] = field(default_factory=[])
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def to_json(self):
-        return json.dumps({
+        return {
             "text": self.text,
             "execution_id": self.execution_id,
             "chunk_id": self.chunk_id,
+            "parent_id": self.parent_id,
             "vectors": self.vectors,
             "metadata": self.metadata
-        })
+        }
 @dataclass
 class VectorStorageSearchResponse:
     status: bool
-    result: VectorStorageSearchItem = field(default_factory=None)
+    result: List[VectorStorageSearchItem] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def to_json(self):
+        return {
+            "status": self.status,
+            "result": [item.to_json() for item in self.result],
+            "metadata": self.metadata
+        }
 
     
 class VectorStorage(DBStorage, ABC):

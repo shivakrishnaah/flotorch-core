@@ -42,7 +42,7 @@ class BedrockInferencer(BaseInferencer):
             Tuple[Dict[Any, Any], str]: Metadata and the generated response text.
         """
         try:
-            converse_prompt = self.generate_prompt(user_query, context)
+            converse_prompt = self._generate_prompt(user_query, context)
             messages = self._prepare_payload(context, converse_prompt)
             inference_config={"maxTokens": 512, "temperature": self.temperature, "topP": 0.9}
             response = self.client.converse(
@@ -63,7 +63,7 @@ class BedrockInferencer(BaseInferencer):
             logger.error(f"Error generating text with Bedrock: {str(e)}")
             raise
 
-    def generate_prompt(self, user_query: str, context: List[Dict]) -> str:
+    def _generate_prompt(self, user_query: str, context: List[Dict]) -> str:
         """
         Construct a prompt for the Bedrock inferencer based on the user query and context.
 
