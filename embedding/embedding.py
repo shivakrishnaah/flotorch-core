@@ -3,6 +3,7 @@ import re
 from typing import List, Dict
 
 from chunking.chunking import Chunk
+from utils.traceable import Traceable
 
 """
 This class is responsible for embedding the text using the Llama model.
@@ -66,7 +67,7 @@ class Embeddings:
                 }
         }
 
-class EmbeddingList:
+class EmbeddingList(Traceable):
     def __init__(self):
         self.embeddings: List[Embeddings] = []
         self.metadata = EmbeddingMetadata(0, 0)
@@ -74,6 +75,11 @@ class EmbeddingList:
     def append(self, embeddings: Embeddings):
         self.embeddings.append(embeddings)
         self.metadata.append(embeddings.metadata)
+    
+    def get_trace_data(self) -> dict:
+        return {
+            "input_tokens": self.input_tokens
+        }
 
 """
 This class is responsible for embedding the text."""

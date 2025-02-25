@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Tuple
 from logger.global_logger import get_logger
 import boto3
 import random
+from utils.otel_util import trace_and_log_metrics
 
 
 logger = get_logger()

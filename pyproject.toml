@@ -16,7 +16,10 @@ dependencies = [
     "ollama==0.4.6",
     "PyPDF2==3.0.1",
     "opensearch-py==2.8.0",
-    "sagemaker==2.235.2"
+    "sagemaker==2.239.3",
+    "opentelemetry-sdk>=1.28.1",
+    "opentelemetry-instrumentation-logging==0.51b0",
+    "opentelemetry-exporter-otlp>=1.28.1"
 ]
 
 [project.optional-dependencies]
@@ -24,7 +27,9 @@ dev = [
     "pytest==8.3.4", 
     "testcontainers==4.9.0",
     "minio==7.2.15",
-    "moto==5.0.27"
+    "moto==5.0.27",
+    "black==24.2.0",
+    "flake8==7.0.0"
     ]
 
 [tool.setuptools]
@@ -32,3 +37,7 @@ packages = { find = {} }  # Automatically finds all packages in your source.
 
 [tool.flake8]
 max-line-length = 88
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310']

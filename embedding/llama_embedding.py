@@ -1,5 +1,3 @@
-from typing import List
-
 import ollama
 from .embedding import BaseEmbedding, Embeddings, EmbeddingMetadata
 from chunking.chunking import Chunk

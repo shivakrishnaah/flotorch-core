@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import boto3
+from utils.otel_util import trace_and_log_metrics
 
 class BaseGuardRail(ABC):
 
@@ -8,8 +9,7 @@ class BaseGuardRail(ABC):
         self.response = response
         
     @abstractmethod
-    def apply_guardrail(self, text: str,
-        source: str = 'INPUT'):
+    def apply_guardrail(self, text: str, source: str = 'INPUT'):
         pass
 
 class BedrockGuardrail(BaseGuardRail):
@@ -17,7 +17,8 @@ class BedrockGuardrail(BaseGuardRail):
         self.guardrail_id = guardrail_id
         self.guardrail_version = guardrail_version
         self.runtime_client = runtime_client or boto3.client('bedrock-runtime')
-        
+
+    @trace_and_log_metrics    
     def apply_guardrail(self, text: str,
         source: str = 'INPUT'):
         try:
