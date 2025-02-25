@@ -40,8 +40,7 @@ class BaseInferencer(ABC):
         """
         pass
 
-    @abstractmethod
-    def generate_prompt(self, default_prompt: str, user_query: str, context: List[Dict]) -> str:
+    def _generate_prompt(self, default_prompt: str, user_query: str, context: List[Dict]) -> str:
         """
         Construct a prompt for the inferencer based on the user query and context.
 

@@ -1,11 +1,10 @@
 import logging
 import boto3
-from botocore.exceptions import Boto3Error
 from typing import List, Dict, Optional
 
-# Set up logging
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)  # Adjust log level as needed
+from logger.global_logger import get_logger
+
+logger = get_logger()
 
 class BedrockReranker:
     def __init__(self, region: str, rerank_model_id: str, bedrock_client: Optional[boto3.client] = None):
@@ -80,8 +79,6 @@ class BedrockReranker:
             logger.info(f"Successfully reranked {len(reranked_documents)} documents.")
             return reranked_documents
 
-        except Boto3Error as e:
-            logger.error(f"Bedrock API error: {e}")
         except Exception as e:
             logger.exception(f"Unexpected error during reranking: {e}")
 
