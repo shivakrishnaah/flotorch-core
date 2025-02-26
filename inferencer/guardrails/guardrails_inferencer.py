@@ -16,3 +16,9 @@ class GuardRailsInferencer(BaseInferencer):
             return metadata, guardrail_response['outputs'][0]['text']
         
         return metadata, answer
+    
+    def generate_prompt(self, user_query: str, context: List[Dict]) -> str:
+        return self.base_inferencer.generate_prompt(user_query, context)
+
+    def format_context(self, context: List[Dict[str, str]]) -> str:
+        return self.base_inferencer.format_context(context)
