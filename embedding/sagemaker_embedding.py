@@ -55,7 +55,8 @@ class SageMakerEmbedder(BaseEmbedding):
         self.wait_time = 5
 
         if not SageMakerUtils.check_endpoint_exists(self.sagemaker_client, self.embedding_model_endpoint_name):
-            SageMakerUtils.create_jumpstart_endpoint(self.sagemaker_client, self.region, self.role, model_id, self.embedding_model_endpoint_name)
+            model_config = EMBEDDING_MODELS.get(model_id)
+            SageMakerUtils.create_jumpstart_endpoint(self.sagemaker_client, model_config.get("instance_type"), self.region, self.role, model_id, self.embedding_model_endpoint_name)
 
         SageMakerUtils.wait_for_endpoint_creation(self.sagemaker_client, self.embedding_model_endpoint_name)
         

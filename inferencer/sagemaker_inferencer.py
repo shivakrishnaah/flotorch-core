@@ -38,12 +38,15 @@ class SageMakerInferencer(BaseInferencer):
         self.inferencing_model_id = model_id
         self.inferencing_model_endpoint_name = f"{SageMakerUtils.sanitize_name(model_id)[:42]}-inferencing-endpoint"
 
+        model_config = INFERENCER_MODELS.get(model_id)
         if not SageMakerUtils.check_endpoint_exists(self.sagemaker_client, self.inferencing_model_endpoint_name):
             if INFERENCER_MODELS[model_id]['model_source'] == 'jumpstart':
-                SageMakerUtils.create_jumpstart_endpoint(self.sagemaker_client, self.region_name, self.session, model_id, self.inferencing_model_endpoint_name)
+                SageMakerUtils.create_jumpstart_endpoint(self.sagemaker_client, model_config.get("instance_type"), self.region_name, self.session, model_id, self.inferencing_model_endpoint_name)
             elif INFERENCER_MODELS[model_id]['model_source'] == 'huggingface':
                 pass
                 # TODO: Implement HuggingFace model deployment logic
+
+        SageMakerUtils.wait_for_endpoint_creation(self.sagemaker_client, self.inferencing_model_endpoint_name)
 
 
         self.predictor = Predictor(

@@ -91,7 +91,7 @@ class SageMakerUtils:
                 raise
 
     @staticmethod
-    def create_jumpstart_endpoint(sagemaker_client, region, role, model_id: str, endpoint_name: str) -> bool:
+    def create_jumpstart_endpoint(sagemaker_client, instance_type, region, role, model_id: str, endpoint_name: str) -> bool:
         """
         Creates a SageMaker endpoint for JumpStart models.
         Reuses existing model and endpoint configuration if available.
@@ -104,11 +104,6 @@ class SageMakerUtils:
             bool: True if the endpoint is successfully created, False otherwise.
         """
         try:
-            model_config = EMBEDDING_MODELS.get(model_id)
-            if not model_config or model_config.get("model_source") != "jumpstart":
-                logger.error(f"Model ID '{model_id}' is not a valid JumpStart model.")
-                return False
-
             boto_session = boto3.Session(region_name=region)
             sagemaker_session = sagemaker.Session(boto_session=boto_session)
 
@@ -139,7 +134,7 @@ class SageMakerUtils:
                     # Use model.deploy to handle everything
                     model.deploy(
                         initial_instance_count=1,
-                        instance_type=model_config["instance_type"],
+                        instance_type=instance_type,
                         endpoint_name=endpoint_name,
                         accept_eula=True
                     )
