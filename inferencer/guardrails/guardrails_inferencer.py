@@ -13,7 +13,10 @@ class GuardRailsInferencer(BaseInferencer):
 
         guardrail_response = self.base_guardrail.apply_guardrail(answer, 'OUTPUT')
         if guardrail_response['action'] == 'GUARDRAIL_INTERVENED':
-            return metadata, guardrail_response['outputs'][0]['text']
+            return {
+                'guardrail_output_assessment': guardrail_response.get('assessments', []),
+                'guardrail_blocked': True
+            }, guardrail_response['outputs'][0]['text']
         
         return metadata, answer
     

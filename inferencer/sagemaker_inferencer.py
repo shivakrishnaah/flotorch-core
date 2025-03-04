@@ -40,7 +40,7 @@ class SageMakerInferencer(BaseInferencer):
 
         if not SageMakerUtils.check_endpoint_exists(self.sagemaker_client, self.inferencing_model_endpoint_name):
             if INFERENCER_MODELS[model_id]['model_source'] == 'jumpstart':
-                SageMakerUtils.create_jumpstart_endpoint(self.sagemaker_client, self.region, self.session, model_id, self.inferencing_model_endpoint_name)
+                SageMakerUtils.create_jumpstart_endpoint(self.sagemaker_client, self.region_name, self.session, model_id, self.inferencing_model_endpoint_name)
             elif INFERENCER_MODELS[model_id]['model_source'] == 'huggingface':
                 pass
                 # TODO: Implement HuggingFace model deployment logic
@@ -185,7 +185,7 @@ class SageMakerInferencer(BaseInferencer):
         
         example_text = ""
         for example in selected_examples:
-            example_text += f"- {example["example"]}\n"
+            example_text += f"- {example['example']}\n"
 
         logger.info(f"into {self.n_shot_prompts} shot prompt  with examples {len(selected_examples)}")
 
