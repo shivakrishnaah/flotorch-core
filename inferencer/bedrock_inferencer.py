@@ -43,7 +43,7 @@ class BedrockInferencer(BaseInferencer):
         """
         try:
             converse_prompt = self.generate_prompt(user_query, context)
-            messages = self._prepare_payload(context, converse_prompt)
+            messages = self._prepare_payload(converse_prompt)
             inference_config={"maxTokens": 512, "temperature": self.temperature, "topP": 0.9}
             response = self.client.converse(
                 modelId=self.model_id,
@@ -108,10 +108,7 @@ class BedrockInferencer(BaseInferencer):
 
         return prompt.strip()
 
-    def _prepare_payload(self, context: List[Dict], prompt: str):
-        context_text = self.format_context(context)
-        logger.debug(f"Formatted context text length: {len(context_text)}")
-
+    def _prepare_payload(self, prompt: str):
         conversation = [
             {
                 "role": "user", 
@@ -122,6 +119,9 @@ class BedrockInferencer(BaseInferencer):
 
     def format_context(self, context: List[Dict[str, str]]) -> str:
         """Format context documents into a single string."""
+        if not context or len(context) == 0:
+            return ""
+        
         context_text = "\n".join([
             f"Context {i+1}:\n{doc.get('text', '')}"
             for i, doc in enumerate(context)

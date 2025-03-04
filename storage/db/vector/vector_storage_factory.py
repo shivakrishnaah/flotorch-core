@@ -1,3 +1,4 @@
+from storage.db.vector.no_ops_vector_storage import NoOpsVectorStorage
 from storage.db.vector.open_search import OpenSearchClient
 from storage.db.vector.bedrock_knowledgebase_storage import BedrockKnowledgeBaseStorage
 from storage.db.vector.vector_storage import VectorStorage
@@ -7,6 +8,7 @@ from typing import Optional
 class VectorStorageFactory:
     @staticmethod
     def create_vector_storage(
+        knowledge_base: bool,
         use_bedrock_kb: bool,
         embedding: BaseEmbedding,
         opensearch_host: Optional[str] = None,
@@ -31,6 +33,9 @@ class VectorStorageFactory:
         :param aws_region: AWS region for Bedrock Knowledge Base (Defaults to "us-east-1").
         :return: An instance of `VectorStorage` (either `OpenSearchClient` or `BedrockKnowledgeBaseStorage`).
         """
+        if knowledge_base:
+            return NoOpsVectorStorage()
+
         if use_bedrock_kb:
             if not knowledge_base_id:
                 raise ValueError("Knowledge Base ID must be provided when using Bedrock Knowledge Base.")
