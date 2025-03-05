@@ -13,7 +13,7 @@ from sagemaker.predictor import Predictor
 logger = get_logger()
 
 class SageMakerInferencer(BaseInferencer):
-    def __init__(self, model_id: str, region: str = "us-east-1", n_shot_prompts: int = 0, temperature: float = 0.7, n_shot_prompt_guide_obj: Dict[str, List[Dict[str, str]]] = None):
+    def __init__(self, model_id: str, region: str, role_arn: str, n_shot_prompts: int = 0, temperature: float = 0.7, n_shot_prompt_guide_obj: Dict[str, List[Dict[str, str]]] = None):
         """
         Initialize the BedrockInferencer with Bedrock-specific parameters.
 
@@ -25,6 +25,7 @@ class SageMakerInferencer(BaseInferencer):
             n_shot_prompt_guide_obj (Dict[str, List[Dict[str, str]]]): Guide object for few-shot examples.
         """
         super().__init__(model_id, region, n_shot_prompts, temperature, n_shot_prompt_guide_obj)
+        self.role = role_arn
         self.client = boto3.client("sagemaker-runtime", region_name=region)
         self.sagemaker_client = boto3.client('sagemaker', region_name=region)
 
@@ -41,9 +42,9 @@ class SageMakerInferencer(BaseInferencer):
         model_config = INFERENCER_MODELS.get(model_id)
         if not SageMakerUtils.check_endpoint_exists(self.sagemaker_client, self.inferencing_model_endpoint_name):
             if INFERENCER_MODELS[model_id]['model_source'] == 'jumpstart':
-                SageMakerUtils.create_jumpstart_endpoint(self.sagemaker_client, model_config.get("instance_type"), self.region_name, self.session, model_id, self.inferencing_model_endpoint_name)
+                SageMakerUtils.create_jumpstart_endpoint(self.sagemaker_client, model_config.get("instance_type"), self.region_name, self.role, model_id, self.inferencing_model_endpoint_name)
             elif INFERENCER_MODELS[model_id]['model_source'] == 'huggingface':
-                pass
+                SageMakerUtils.create_huggingface_endpoint(self.sagemaker_client, model_config.get("instance_type"), self.region_name, self.role, model_id, self.inferencing_model_endpoint_name)
                 # TODO: Implement HuggingFace model deployment logic
 
         SageMakerUtils.wait_for_endpoint_creation(self.sagemaker_client, self.inferencing_model_endpoint_name)

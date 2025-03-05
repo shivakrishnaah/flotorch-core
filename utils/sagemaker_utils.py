@@ -153,6 +153,70 @@ class SageMakerUtils:
             logger.error(f"Error while creating endpoint '{endpoint_name}' for model '{model_id}': {e}")
             return False
 
+
+    @staticmethod
+    def create_huggingface_endpoint(sagemaker_client, instance_type, model_id: str, endpoint_name: str) -> bool:
+        """
+        Creates a SageMaker endpoint for HuggingFace models.
+        Reuses existing model and endpoint configuration if available.
+
+        Args:
+            model_id (str): The model ID for the SageMaker HuggingFace model.
+            endpoint_name (str): The name of the SageMaker endpoint to be created.
+
+        Returns:
+            bool: True if the endpoint is successfully created, False otherwise.
+        """
+        try:
+            boto_session = boto3.Session()
+            sagemaker_session = sagemaker.Session(boto_session=boto_session)
+
+            # Initialize HuggingFace model
+            model = sagemaker.huggingface.HuggingFaceModel(
+                model_id=model_id,
+                sagemaker_session=sagemaker_session
+            )
+
+            # Check if the endpoint configuration exists
+            try:
+                sagemaker_client.describe_endpoint_config(
+                    EndpointConfigName=endpoint_name
+                )
+                logger.info(f"Endpoint configuration '{endpoint_name}' exists. Deploying endpoint.")
+
+                # Deploy the endpoint using the existing configuration
+                sagemaker_client.create_endpoint(
+                    EndpointName=endpoint_name,
+                    EndpointConfigName=endpoint_name
+                )
+            except sagemaker_client.exceptions.ClientError as e:
+                error_code = e.response['Error']['Code']
+                if error_code == 'ValidationException' and 'Could not find endpoint configuration' in e.response['Error']['Message']:
+                    logger.info(f"Endpoint configuration '{endpoint_name}' does not exist. Deploying using model.deploy().")
+
+                    # Use model.deploy to handle everything
+                    model.deploy(
+                        initial_instance_count=1,
+                        instance_type=instance_type,
+                        endpoint_name=endpoint_name,
+                        accept_eula=True
+                    )
+                else:
+                    logger.error(f"Error while checking endpoint configuration: {e}")
+                    raise
+
+            logger.info(f"Successfully created endpoint '{endpoint_name}' for model '{model_id}'.")
+            return True
+
+        except sagemaker_client.exceptions.ResourceLimitExceeded as e:
+            logger.error(f"Resource limit exceeded while creating endpoint: {e}")
+            return False
+
+        except Exception as e:
+            logger.error(f"Error while creating endpoint '{endpoint_name}' for model '{model_id}': {e}")
+            return False
+        
+        
     @staticmethod
     def wait_for_endpoint_creation(sagemaker_client, endpoint_name: str, wait_interval: int = 5, timeout: int = 100000) -> bool:
         """
