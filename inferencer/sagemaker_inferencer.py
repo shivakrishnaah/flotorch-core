@@ -31,9 +31,6 @@ class SageMakerInferencer(BaseInferencer):
 
         logger.info(f"Initializing SageMaker Generator for model: {model_id}")
 
-        self.client = boto3.client("sagemaker-runtime", region_name=region)
-        self.sagemaker_client = boto3.client('sagemaker', region_name=region)
-
         self.session = Session(boto_session=boto3.Session(region_name=region))
 
         self.inferencing_model_id = model_id
@@ -45,7 +42,6 @@ class SageMakerInferencer(BaseInferencer):
                 SageMakerUtils.create_jumpstart_endpoint(self.sagemaker_client, model_config.get("instance_type"), self.region_name, self.role, model_id, self.inferencing_model_endpoint_name)
             elif INFERENCER_MODELS[model_id]['model_source'] == 'huggingface':
                 SageMakerUtils.create_huggingface_endpoint(self.sagemaker_client, model_config.get("instance_type"), self.region_name, self.role, model_id, self.inferencing_model_endpoint_name)
-                # TODO: Implement HuggingFace model deployment logic
 
         SageMakerUtils.wait_for_endpoint_creation(self.sagemaker_client, self.inferencing_model_endpoint_name)
 
