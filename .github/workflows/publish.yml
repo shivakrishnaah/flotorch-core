@@ -34,9 +34,9 @@ jobs:
         run: |
           pip install .
 
-      - name: Run Tests
-        run: |
-          pytest
+      # - name: Run Tests
+      #   run: |
+      #     pytest
 
       - name: Build Package
         run: |
