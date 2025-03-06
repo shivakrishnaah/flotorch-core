@@ -4,6 +4,8 @@ from logger.global_logger import get_logger
 import boto3
 import random
 
+from utils.bedrock_retry_handler import BedRockRetryHander
+
 
 logger = get_logger()
 
@@ -29,27 +31,32 @@ class BedrockInferencer(BaseInferencer):
             region_name=region
         )
 
-    # TODO: retry needs to be implemented
-    def generate_text(self, user_query: str, context: List[Dict]) -> Tuple[Dict[Any, Any], str]:
+    @BedRockRetryHander()
+    def generate_text(self, user_query: str, context: List[Dict] = None) -> Tuple[Dict[Any, Any], str]:
         """
         Generate a response based on the user query and context using Bedrock.
-
-        Args:
-            user_query (str): The question or input from the user.
-            context (List[Dict]): Contextual data to assist in generating a response.
-
-        Returns:
-            Tuple[Dict[Any, Any], str]: Metadata and the generated response text.
         """
         try:
-            converse_prompt = self._generate_prompt(user_query, context)
-            messages = self._prepare_payload(context, converse_prompt)
-            inference_config={"maxTokens": 512, "temperature": self.temperature, "topP": 0.9}
-            response = self.client.converse(
-                modelId=self.model_id,
-                messages=messages,
-                inferenceConfig=inference_config
-            )
+            system_prompt, messages = self.generate_prompt(user_query, context)
+            
+            inference_config = {
+                "maxTokens": 512, 
+                "temperature": self.temperature, 
+                "topP": 0.9
+            }
+            
+            is_titan_v1 = self.model_id in ("amazon.titan-text-express-v1", "amazon.titan-text-lite-v1")
+            request_params = {
+                "modelId": self.model_id,
+                "messages": ([self._prepare_conversation(role="user", message=system_prompt)] if is_titan_v1 else []) + messages,
+                "inferenceConfig": inference_config
+            }
+            
+            if not is_titan_v1:
+                request_params["system"] = [{"text": system_prompt}]
+            
+            response = self.client.converse(**request_params)
+            
             metadata = {}
             if 'usage' in response:
                 for key, value in response['usage'].items():
@@ -57,71 +64,67 @@ class BedrockInferencer(BaseInferencer):
             if 'metrics' in response:
                 for key, value in response['metrics'].items():
                     metadata[key] = value
-
+            
             return metadata, self._extract_response(response)
         except Exception as e:
             logger.error(f"Error generating text with Bedrock: {str(e)}")
             raise
 
-    def _generate_prompt(self, user_query: str, context: List[Dict]) -> str:
+    def generate_prompt(self, user_query: str, context: List[Dict] = None) -> Tuple[str, List[Dict[str, Any]]]:
         """
         Construct a prompt for the Bedrock inferencer based on the user query and context.
-
-        Args:
-            user_query (str): The question or input from the user.
-            context (List[Dict]): Contextual data to assist in generating a response.
-
-        Returns:
-            str: The constructed prompt.
         """
-        system_prompt = self.n_shot_prompt_guide_obj.get("system_prompt")
-
-        context_text = self._format_context(context)
-
+        messages = []
+        context_text = ""
+        
+        # Validate n_shot_prompt
+        if self.n_shot_prompts < 0:
+            raise ValueError("n_shot_prompts must be non-negative")
+        
+        # Get system prompt
+        system_prompt = "" if not self.n_shot_prompt_guide_obj or not self.n_shot_prompt_guide_obj.get("system_prompt") else self.n_shot_prompt_guide_obj.get("system_prompt")
+        
+        # Process context
+        if context:
+            context_text = self.format_context(context)
+            if context_text:
+                messages.append(self._prepare_conversation(role="user", message=context_text))
+        
         base_prompt = self.n_shot_prompt_guide_obj.get("user_prompt", "") if self.n_shot_prompt_guide_obj else ""
-
-        if self.n_shot_prompts == 0:
-            prompt = (
-                f"{system_prompt}\n\n"
-                f"<context>\n{context_text}\n</context>\n"
-                f"{base_prompt}\n"
-                f"Question: {user_query}"
-            )
-            return prompt.strip()
-
+        if base_prompt:
+            messages.append(self._prepare_conversation(role="user", message=base_prompt))
+        
+        # Get examples
         examples = self.n_shot_prompt_guide_obj.get("examples", []) if self.n_shot_prompt_guide_obj else []
-        selected_examples = (
-            random.sample(examples, self.n_shot_prompts)
-            if len(examples) > self.n_shot_prompts
-            else examples
-        )
+        selected_examples = random.sample(examples, self.n_shot_prompts) if len(examples) > self.n_shot_prompts else examples
+        
+        # Format examples
+        for example in selected_examples:
+            if 'example' in example:
+                messages.append(self._prepare_conversation(role="user", message=example['example']))
+            elif 'question' in example and 'answer' in example:
+                messages.append(self._prepare_conversation(role="user", message=example['question']))
+                messages.append(self._prepare_conversation(role="assistant", message=example['answer']))
+        
+        logger.info(f"Using {self.n_shot_prompts} shot prompt with {len(selected_examples)} examples")
+        
+        # Add user query
+        messages.append(self._prepare_conversation(role="user", message=user_query))
+        
+        return system_prompt, messages
 
-        example_text = "\n".join([f"- {example['example']}" for example in selected_examples])
+    def _prepare_conversation(self, message: str, role: str) -> Dict[str, Any]:
+        """Formats a message and role into a conversation dictionary."""
+        if not message or not role:
+            logger.error("Error in parsing message or role")
+        
+        return {"role": role, "content": [{"text": message}]}
 
-        prompt = (
-            f"{system_prompt}\n\n"
-            f"Few examples:\n{example_text}\n\n"
-            f"<context>\n{context_text}\n</context>\n"
-            f"{base_prompt}\n"
-            f"Question: {user_query}"
-        )
-
-        return prompt.strip()
-
-    def _prepare_payload(self, context: List[Dict], prompt: str):
-        context_text = self._format_context(context)
-        logger.debug(f"Formatted context text length: {len(context_text)}")
-
-        conversation = [
-            {
-                "role": "user", 
-                "content": [{"text" : f"{prompt}"}]
-            }
-        ]
-        return conversation
-
-    def _format_context(self, context: List[Dict[str, str]]) -> str:
+    def format_context(self, context: List[Dict[str, str]]) -> str:
         """Format context documents into a single string."""
+        if not context or len(context) == 0:
+            return ""
+        
         context_text = "\n".join([
             f"Context {i+1}:\n{doc.get('text', '')}"
             for i, doc in enumerate(context)
